@@ -1,0 +1,1 @@
+This folder stores archived deployment scripts and docs that are not needed for the main Flask runtime.

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="my">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AZone Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f0f4f8;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(26, 26, 46, 0.9);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(102, 126, 234, 0.4);
+        }
+        .auth-card h2 {
+            color: #fff;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .auth-card .form-control {
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            color: #fff;
+        }
+        .auth-card .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        .auth-card .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .switch-link {
+            color: #63c7ff;
+            text-decoration: none;
+        }
+        .switch-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="text-center mb-4">
+            <h2>
+                <i class="fas fa-robot text-primary"></i>
+                AZone {{ 'စာရင်းသွင်းရန်' if mode == 'register' else 'ဝင်ရောက်ရန်' }}
+            </h2>
+            <p class="text-muted mb-0">
+                {{ 'အသစ်စတင်ဖွင့်ရန် အချက်အလက်များဖြည့်ပါ' if mode == 'register' else 'အကောင့်ဖြင့်ဝင်ရောက်ပါ' }}
+            </p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        {% if mode == 'register' %}
+        <form method="POST" action="{{ url_for('register') }}">
+            <div class="mb-3">
+                <label class="form-label">အသုံးပြုသူအမည်</label>
+                <input type="text" class="form-control" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">အီးမေးလ်</label>
+                <input type="email" class="form-control" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">စကားဝှက်</label>
+                <input type="password" class="form-control" name="password" minlength="6" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">အခန်းကဏ္ဍ</label>
+                <select class="form-select" name="role">
+                    <option value="viewer">ကြည့်ရှုသူ</option>
+                    <option value="editor">တည်းဖြတ်သူ</option>
+                    <option value="owner">ပိုင်ရှင်</option>
+                </select>
+                <small class="text-muted d-block mt-1">ပိုင်ရှင် အခန်းကဏ္ဍ ထည့်ရန် ရှိပြီးသား ပိုင်ရှင် မှသာ ပြင်နိုင်ပါသည်။</small>
+            </div>
+            <button type="submit" class="btn btn-primary">စာရင်းသွင်းရန်</button>
+            <div class="text-center mt-3">
+                <small>အကောင့်ရှိပြီးသားလား? <a href="{{ url_for('login') }}" class="switch-link">ဝင်ရောက်ရန် သို့ပြန်သွားမယ်</a></small>
+            </div>
+        </form>
+        {% else %}
+        <form method="POST" action="{{ url_for('login', next=request.args.get('next')) }}">
+            <div class="mb-3">
+                <label class="form-label">အသုံးပြုသူအမည်</label>
+                <input type="text" class="form-control" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">စကားဝှက်</label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" name="remember" id="rememberMe">
+                <label class="form-check-label" for="rememberMe">
+                    မှတ်ထားရန်
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">ဝင်ရောက်ရန်</button>
+            <div class="text-center mt-3">
+                <small>အကောင့်မရှိသေးဘူးလား? <a href="{{ url_for('register') }}" class="switch-link">စာရင်းသွင်းရန် အသစ်ဖွင့်မယ်</a></small>
+            </div>
+        </form>
+        {% endif %}
+        <p class="text-center text-muted mt-4 mb-0" style="font-size: 0.9rem;">
+            ပုံမှန် စီမံခန့်ခွဲသူ: admin / admin123
+        </p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

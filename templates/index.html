@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Zone Studio - စီမံခန့်ခွဲမှု ဒက်ရှ်ဘုတ်</title>
+    <!-- Myanmar Fonts - Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-responsive.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Fixed Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <span>A Zone Studio</span>
+                </div>
+                <p class="subtitle">စီမံခန့်ခွဲမှု ဒက်ရှ်ဘုတ်</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>ဒက်ရှ်ဘုတ်</span>
+                </a>
+                <a href="#" class="nav-item" data-section="leads">
+                    <i class="fas fa-address-book"></i>
+                    <span>လုပ်ငန်းအခွင့်အလမ်းများ &amp; ဆက်သွယ်ရမည့်သူများ</span>
+                </a>
+                <a href="#" class="nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>အသုံးပြုသူများ</span>
+                </a>
+                <a href="#" class="nav-item" data-section="services">
+                    <i class="fas fa-box"></i>
+                    <span>ဝန်ဆောင်မှုများ</span>
+                </a>
+                <a href="#" class="nav-item" data-section="projects">
+                    <i class="fas fa-folder-open"></i>
+                    <span>စီမံကိန်းများ</span>
+                </a>
+                <a href="#" class="nav-item" data-section="payments">
+                    <i class="fas fa-credit-card"></i>
+                    <span>ငွေပေးချေမှုများ</span>
+                </a>
+                <a href="#" class="nav-item" data-section="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>ခွဲခြမ်းစိတ်ဖြာမှု</span>
+                </a>
+                <a href="#" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>ဆက်တင်များ</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">စီမံခန့်ခွဲသူ</span>
+                        <span class="user-role">အုပ်ချုပ်ရေးမှူး</span>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>ထွက်ရန်</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">ဒက်ရှ်ဘုတ်</h1>
+                    <p class="breadcrumb">ပင်မစာမျက်နှာ / ဒက်ရှ်ဘုတ်</p>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="ရှာဖွေရန်..." class="search-input">
+                    </div>
+                    <button class="notification-btn" id="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-avatar-small">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span class="welcome-text">ကြိုဆိုပါသည်၊ စီမံခန့်ခွဲသူ</span>
+                        <i class="fas fa-chevron-down dropdown-icon"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area (Empty - Ready for Data Modules) -->
+            <div class="content-area">
+                <!-- Leads & Contacts Section -->
+                <div class="section-content active" id="leads-section">
+                    <div class="section-header">
+                        <h2 class="section-title">ရရှိလာသော လုပ်ငန်းအခွင့်အလမ်းများ</h2>
+                        <button class="btn btn-primary" id="add-lead-btn">
+                            <i class="fas fa-plus"></i> အခွင့်အလမ်းအသစ် ထည့်ရန်
+                        </button>
+                    </div>
+
+                    <!-- Search and Filter Bar -->
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="lead-search" placeholder="အမည်၊ အီးမေးလ် သို့မဟုတ် ဖုန်းနံပါတ်ဖြင့် ရှာဖွေရန်..." class="search-input-filter">
+                        </div>
+                        <div class="filter-group">
+                            <select id="filter-service" class="filter-select">
+                                <option value="">ဝန်ဆောင်မှုအားလုံး</option>
+                                <option value="Bot Reply Packages">Bot Reply Packages</option>
+                                <option value="Auto Post Packages">Auto Post Packages</option>
+                                <option value="Content Packs">Content Packs</option>
+                                <option value="Video Packs">Video Packs</option>
+                                <option value="AI Tools & Automation">AI Tools & Automation</option>
+                                <option value="Payment Integration">Payment Integration</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="filter-status" class="filter-select">
+                                <option value="">အားလုံး</option>
+                                <option value="New">အသစ်</option>
+                                <option value="Contacted">ဆက်သွယ်ပြီး</option>
+                                <option value="Converted">ပြောင်းလဲပြီး</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" id="clear-filters-btn">
+                            <i class="fas fa-times"></i> စစ်ထုတ်မှုများ ရှင်းလင်းရန်
+                        </button>
+                    </div>
+
+                    <!-- Leads Table -->
+                    <div class="table-container">
+                        <table class="data-table" id="leads-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" data-column="name">
+                                        အမည်
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable" data-column="email">
+                                        အီးမေးလ်
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable" data-column="phone">
+                                        ဖုန်း
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable" data-column="service">
+                                        စိတ်ဝင်စားသော ဝန်ဆောင်မှု
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable" data-column="date">
+                                        ဆက်သွယ်သည့်ရက်စွဲ
+                                        <i class="fas fa-sort sort-icon"></i>
+                                    </th>
+                                    <th>အခြေအနေ</th>
+                                    <th>လုပ်ဆောင်ချက်များ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leads-table-body">
+                                <!-- Table rows will be dynamically inserted here -->
+                            </tbody>
+                        </table>
+                        <div class="table-empty" id="table-empty" style="display: none;">
+                            <i class="fas fa-inbox"></i>
+                            <p>သင့်ရွေးချယ်ထားသော အချက်အလက်များနှင့် ကိုက်ညီသော အခွင့်အလမ်းများ မတွေ့ရှိပါ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Section -->
+                <div class="section-content" id="dashboard-section">
+                    <div class="dashboard-overview">
+                        <!-- KPI Cards Section -->
+                        <div class="kpi-cards-grid">
+                            <!-- KPI Card 1: New Leads -->
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon leads">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="kpi-info">
+                                        <h3 class="kpi-title">အခွင့်အလမ်းအသစ်များ</h3>
+                                        <p class="kpi-subtitle">ပြီးခဲ့သော ၃၀ ရက်</p>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-new-leads">0</div>
+                                <div class="kpi-trend">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="kpi-leads-trend">0%</span>
+                                    <span class="trend-label">ပြီးခဲ့သော လမှ</span>
+                                </div>
+                            </div>
+
+                            <!-- KPI Card 2: Active Projects -->
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon projects">
+                                        <i class="fas fa-tasks"></i>
+                                    </div>
+                                    <div class="kpi-info">
+                                        <h3 class="kpi-title">လုပ်ဆောင်နေသော စီမံကိန်းများ</h3>
+                                        <p class="kpi-subtitle">လက်ရှိ လုပ်ဆောင်နေသည်</p>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-active-projects">0</div>
+                                <div class="kpi-trend">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="kpi-projects-trend">0%</span>
+                                    <span class="trend-label">ပြီးခဲ့သော ရက်သတ္တပတ်မှ</span>
+                                </div>
+                            </div>
+
+                            <!-- KPI Card 3: Total Customers -->
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon customers">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="kpi-info">
+                                        <h3 class="kpi-title">စုစုပေါင်း ဖောက်သည်များ</h3>
+                                        <p class="kpi-subtitle">စုစုပေါင်း</p>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-total-customers">0</div>
+                                <div class="kpi-trend">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="kpi-customers-trend">0%</span>
+                                    <span class="trend-label">ယခုလ တိုးတက်မှု</span>
+                                </div>
+                            </div>
+
+                            <!-- KPI Card 4: Monthly Revenue -->
+                            <div class="kpi-card">
+                                <div class="kpi-header">
+                                    <div class="kpi-icon revenue">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <div class="kpi-info">
+                                        <h3 class="kpi-title">လစဉ် အမြတ်ငွေ</h3>
+                                        <p class="kpi-subtitle">ရည်မှန်းချက် တိုးတက်မှု</p>
+                                    </div>
+                                </div>
+                                <div class="kpi-value" id="kpi-monthly-revenue">$0</div>
+                                <div class="kpi-trend">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span id="kpi-revenue-trend">0%</span>
+                                    <span class="trend-label">$50,000 ရည်မှန်းချက်၏</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chart Section -->
+                        <div class="dashboard-section">
+                            <div class="section-header">
+                                <h2 class="section-title">အချိန်ကာလအလိုက် ဝန်ဆောင်မှု ရေပန်းစားမှု</h2>
+                                <div class="chart-controls">
+                                    <select class="chart-period-select">
+                                        <option value="7days">ပြီးခဲ့သော ၇ ရက်</option>
+                                        <option value="30days" selected>ပြီးခဲ့သော ၃၀ ရက်</option>
+                                        <option value="90days">ပြီးခဲ့သော ၉၀ ရက်</option>
+                                        <option value="year">ယခုနှစ်</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <div class="chart-placeholder-icon">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                    <p class="chart-placeholder-text">ဝန်ဆောင်မှု ရေပန်းစားမှု ဇယား</p>
+                                    <p class="chart-placeholder-subtext">ဇယားကွက်ကို ဤနေရာတွင် ပြသထားပါမည်</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Leads Section -->
+                        <div class="dashboard-section">
+                            <div class="section-header">
+                                <h2 class="section-title">လက်ရှိ ရရှိလာသော အခွင့်အလမ်းများ</h2>
+                                <a href="#" class="view-all-link" id="view-all-leads">
+                                    အားလုံးကြည့်ရန် <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table condensed-table" id="recent-leads-table">
+                                    <thead>
+                                        <tr>
+                                            <th>အမည်</th>
+                                            <th>ဝန်ဆောင်မှု</th>
+                                            <th>အခြေအနေ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-leads-table-body">
+                                        <!-- Recent leads will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
+                                <div class="table-empty" id="recent-leads-empty" style="display: none;">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>လက်ရှိ အခွင့်အလမ်းများ မတွေ့ရှိပါ</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-content" id="users-section">
+                    <div class="users-management">
+                        <!-- Section Header -->
+                        <div class="section-header">
+                            <h2 class="section-title">ဖောက်သည်စာရင်း</h2>
+                            <button class="btn btn-primary" id="add-customer-btn">
+                                <i class="fas fa-plus"></i> ဖောက်သည်အသစ် ထည့်ရန်
+                            </button>
+                        </div>
+
+                        <!-- Search and Filter Bar -->
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="customer-search" placeholder="အမည်၊ အီးမေးလ် သို့မဟုတ် ဖောက်သည်နံပါတ်ဖြင့် ရှာဖွေရန်..." class="search-input-filter">
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-customer-status" class="filter-select">
+                                    <option value="">အားလုံး</option>
+                                    <option value="Active">လုပ်ဆောင်နေသည်</option>
+                                    <option value="Trial">စမ်းသပ်နေသည်</option>
+                                    <option value="Suspended">ရပ်ဆိုင်းထားသည်</option>
+                                    <option value="Inactive">မလုပ်ဆောင်တော့ပါ</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-customer-package" class="filter-select">
+                                    <option value="">ပက်ကေ့ချ်အားလုံး</option>
+                                    <option value="Bot Reply Packages">Bot Reply Packages</option>
+                                    <option value="Auto Post Packages">Auto Post Packages</option>
+                                    <option value="Content Packs">Content Packs</option>
+                                    <option value="Video Packs">Video Packs</option>
+                                    <option value="AI Tools & Automation">AI Tools & Automation</option>
+                                    <option value="Payment Integration">Payment Integration</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary" id="clear-customer-filters-btn">
+                                <i class="fas fa-times"></i> စစ်ထုတ်မှုများ ရှင်းလင်းရန်
+                            </button>
+                        </div>
+
+                        <!-- Customers Table -->
+                        <div class="table-container">
+                            <table class="data-table" id="customers-table">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable" data-column="id">
+                                            ဖောက်သည်နံပါတ်
+                                            <i class="fas fa-sort sort-icon"></i>
+                                        </th>
+                                        <th class="sortable" data-column="name">
+                                            အမည်
+                                            <i class="fas fa-sort sort-icon"></i>
+                                        </th>
+                                        <th class="sortable" data-column="email">
+                                            အီးမေးလ်
+                                            <i class="fas fa-sort sort-icon"></i>
+                                        </th>
+                                        <th class="sortable" data-column="phone">
+                                            ဖုန်း
+                                            <i class="fas fa-sort sort-icon"></i>
+                                        </th>
+                                        <th class="sortable" data-column="package">
+                                            လက်ရှိ ပက်ကေ့ချ်
+                                            <i class="fas fa-sort sort-icon"></i>
+                                        </th>
+                                        <th class="sortable" data-column="joinDate">
+                                            ပါဝင်သည့်ရက်စွဲ
+                                            <i class="fas fa-sort sort-icon"></i>
+                                        </th>
+                                        <th>အခြေအနေ</th>
+                                        <th>လုပ်ဆောင်ချက်များ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customers-table-body">
+                                    <!-- Customer rows will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                            <div class="table-empty" id="customers-empty" style="display: none;">
+                                <i class="fas fa-inbox"></i>
+                                <p>သင့်ရွေးချယ်ထားသော အချက်အလက်များနှင့် ကိုက်ညီသော ဖောက်သည်များ မတွေ့ရှိပါ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-content" id="services-section">
+                    <!-- Services content will be added here -->
+                </div>
+                
+                <div class="section-content" id="projects-section">
+                    <div class="projects-management">
+                        <!-- Section Header -->
+                        <div class="section-header">
+                            <h2 class="section-title">စီမံကိန်း စီမံခန့်ခွဲမှု</h2>
+                            <button class="btn btn-primary" id="add-project-btn">
+                                <i class="fas fa-plus"></i> စီမံကိန်းအသစ် ထည့်ရန်
+                            </button>
+                        </div>
+
+                        <!-- Filter Bar -->
+                        <div class="filter-bar">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="project-search" placeholder="အမည် သို့မဟုတ် ဖောက်သည်ဖြင့် စီမံကိန်းများ ရှာဖွေရန်..." class="search-input-filter">
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-project-service" class="filter-select">
+                                    <option value="">ဝန်ဆောင်မှုအမျိုးအစား အားလုံး</option>
+                                    <option value="Bot Reply Packages">Bot Reply Packages</option>
+                                    <option value="Auto Post Packages">Auto Post Packages</option>
+                                    <option value="Content Packs">Content Packs</option>
+                                    <option value="Video Packs">Video Packs</option>
+                                    <option value="AI Tools & Automation">AI Tools & Automation</option>
+                                    <option value="Payment Integration">Payment Integration</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-project-staff" class="filter-select">
+                                    <option value="">ဝန်ထမ်းအားလုံး</option>
+                                    <option value="John Smith">John Smith</option>
+                                    <option value="Sarah Johnson">Sarah Johnson</option>
+                                    <option value="Mike Chen">Mike Chen</option>
+                                    <option value="Emily Davis">Emily Davis</option>
+                                    <option value="David Wilson">David Wilson</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <select id="filter-project-priority" class="filter-select">
+                                    <option value="">ဦးစားပေးမှု အားလုံး</option>
+                                    <option value="High">ဦးစားပေးမှု မြင့်</option>
+                                    <option value="Medium">ဦးစားပေးမှု အလယ်အလတ်</option>
+                                    <option value="Low">ဦးစားပေးမှု နိမ့်</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary" id="clear-project-filters-btn">
+                                <i class="fas fa-times"></i> စစ်ထုတ်မှုများ ရှင်းလင်းရန်
+                            </button>
+                        </div>
+
+                        <!-- Kanban Board -->
+                        <div class="kanban-board" id="kanban-board">
+                            <!-- To Do Column -->
+                            <div class="kanban-column" data-status="todo">
+                                <div class="kanban-column-header">
+                                    <h3 class="column-title">
+                                        <i class="fas fa-list"></i>
+                                        လုပ်ရမည့်စာရင်း
+                                        <span class="column-count" id="todo-count">0</span>
+                                    </h3>
+                                </div>
+                                <div class="kanban-column-body" id="todo-column">
+                                    <!-- Project cards will be dynamically inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- In Progress Column -->
+                            <div class="kanban-column" data-status="in-progress">
+                                <div class="kanban-column-header">
+                                    <h3 class="column-title">
+                                        <i class="fas fa-spinner"></i>
+                                        လုပ်ဆောင်နေသည်
+                                        <span class="column-count" id="in-progress-count">0</span>
+                                    </h3>
+                                </div>
+                                <div class="kanban-column-body" id="in-progress-column">
+                                    <!-- Project cards will be dynamically inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- In Review Column -->
+                            <div class="kanban-column" data-status="in-review">
+                                <div class="kanban-column-header">
+                                    <h3 class="column-title">
+                                        <i class="fas fa-eye"></i>
+                                        စိစစ်နေသည်
+                                        <span class="column-count" id="in-review-count">0</span>
+                                    </h3>
+                                </div>
+                                <div class="kanban-column-body" id="in-review-column">
+                                    <!-- Project cards will be dynamically inserted here -->
+                                </div>
+                            </div>
+
+                            <!-- Completed Column -->
+                            <div class="kanban-column" data-status="completed">
+                                <div class="kanban-column-header">
+                                    <h3 class="column-title">
+                                        <i class="fas fa-check-circle"></i>
+                                        ပြီးစီးပြီး
+                                        <span class="column-count" id="completed-count">0</span>
+                                    </h3>
+                                </div>
+                                <div class="kanban-column-body" id="completed-column">
+                                    <!-- Project cards will be dynamically inserted here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-content" id="payments-section">
+                    <!-- Payments content will be added here -->
+                </div>
+                
+                <div class="section-content" id="analytics-section">
+                    <!-- Analytics content will be added here -->
+                </div>
+                
+                <div class="section-content" id="settings-section">
+                    <!-- Settings content will be added here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Dropdown (Hidden by default) -->
+    <div class="notification-dropdown" id="notification-dropdown">
+        <div class="notification-header">
+            <h3>အကြောင်းကြားချက်များ</h3>
+            <button class="mark-all-read">အားလုံး ဖတ်ပြီးဟု အမှတ်အသားပြုရန်</button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="notification-content">
+                    <p class="notification-title">အသုံးပြုသူအသစ် စာရင်းသွင်းပြီး</p>
+                    <p class="notification-time">၂ မိနစ် က</p>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="notification-content">
+                    <p class="notification-title">ငွေပေးချေမှုအသစ် ရရှိပြီး</p>
+                    <p class="notification-time">၁ နာရီ က</p>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <p class="notification-title">စီမံကိန်း ပြီးစီးပြီး</p>
+                    <p class="notification-time">၃ နာရီ က</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

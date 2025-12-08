@@ -1,0 +1,6 @@
+Flask>=2.0,<3
+Flask-Login>=0.6
+requests>=2.25
+google-generativeai>=0.8.3
+python-telegram-bot>=20.7
+python-dotenv>=1.0.0

@@ -1,0 +1,833 @@
+/**
+ * Loading States & User Feedback System
+ * Myanmar Language Support
+ * Mobile-friendly & Non-blocking
+ */
+
+/* ============================================
+   Loading Spinners
+   ============================================ */
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(99, 199, 255, 0.3);
+    border-top-color: #63C7FF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.loading-spinner-sm {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+}
+
+.loading-spinner-lg {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Full page loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(14, 18, 31, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.loading-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loading-overlay-content {
+    text-align: center;
+    color: #F0F4F8;
+}
+
+.loading-overlay-spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(99, 199, 255, 0.3);
+    border-top-color: #63C7FF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
+}
+
+.loading-overlay-message {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #63C7FF;
+    margin-top: 1rem;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+}
+
+/* Inline loading (for buttons, cards) */
+.loading-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #63C7FF;
+    font-size: 0.9375rem;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+}
+
+.loading-inline .loading-spinner {
+    flex-shrink: 0;
+}
+
+/* Button loading state */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.btn-loading .btn-text {
+    opacity: 0;
+}
+
+/* Card loading state */
+.card-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.card-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(14, 18, 31, 0.7);
+    backdrop-filter: blur(5px);
+    border-radius: inherit;
+    z-index: 1;
+}
+
+.card-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(99, 199, 255, 0.3);
+    border-top-color: #63C7FF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    z-index: 2;
+}
+
+/* ============================================
+   Progress Bars
+   ============================================ */
+
+.progress-container {
+    width: 100%;
+    background: rgba(14, 18, 31, 0.5);
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+    position: relative;
+    margin: 1rem 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #63C7FF 0%, #A855F7 100%);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.progress-label {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    margin-top: 0.5rem;
+    text-align: center;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+}
+
+.progress-percentage {
+    font-weight: 600;
+    color: #63C7FF;
+}
+
+/* Circular progress */
+.progress-circle {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    margin: 0 auto;
+}
+
+.progress-circle svg {
+    transform: rotate(-90deg);
+}
+
+.progress-circle-bg {
+    fill: none;
+    stroke: rgba(99, 199, 255, 0.2);
+    stroke-width: 8;
+}
+
+.progress-circle-fill {
+    fill: none;
+    stroke: #63C7FF;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 251.2;
+    transition: stroke-dashoffset 0.3s ease;
+}
+
+.progress-circle-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #63C7FF;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+}
+
+/* ============================================
+   Toast Notifications
+   ============================================ */
+
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 400px;
+    width: 100%;
+    pointer-events: none;
+}
+
+.toast {
+    background: rgba(14, 18, 31, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(99, 199, 255, 0.2);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    min-width: 300px;
+    max-width: 400px;
+    transform: translateX(450px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 12px 0 0 12px;
+}
+
+.toast-success {
+    border-left-color: #10B981;
+}
+
+.toast-success::before {
+    background: #10B981;
+}
+
+.toast-error {
+    border-left-color: #EF4444;
+}
+
+.toast-error::before {
+    background: #EF4444;
+}
+
+.toast-info {
+    border-left-color: #3B82F6;
+}
+
+.toast-info::before {
+    background: #3B82F6;
+}
+
+.toast-warning {
+    border-left-color: #F59E0B;
+}
+
+.toast-warning::before {
+    background: #F59E0B;
+}
+
+.toast-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.toast-success .toast-icon {
+    color: #10B981;
+}
+
+.toast-error .toast-icon {
+    color: #EF4444;
+}
+
+.toast-info .toast-icon {
+    color: #3B82F6;
+}
+
+.toast-warning .toast-icon {
+    color: #F59E0B;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #F0F4F8;
+    margin-bottom: 0.25rem;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+    line-height: 1.5;
+}
+
+.toast-message {
+    font-size: 0.875rem;
+    color: #B0B0B0;
+    line-height: 1.5;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 0.2s ease;
+    margin-top: -0.25rem;
+}
+
+.toast-close:hover {
+    color: #F0F4F8;
+}
+
+/* Progress bar in toast */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: rgba(99, 199, 255, 0.3);
+    border-radius: 0 0 12px 12px;
+    transition: width linear;
+}
+
+.toast-success .toast-progress {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+.toast-error .toast-progress {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* ============================================
+   Tooltips
+   ============================================ */
+
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip {
+    position: absolute;
+    background: rgba(14, 18, 31, 0.95);
+    backdrop-filter: blur(10px);
+    color: #F0F4F8;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-5px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    border: 1px solid rgba(99, 199, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+    line-height: 1.5;
+    max-width: 250px;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+}
+
+/* Tooltip positions */
+.tooltip-top {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    margin-bottom: 8px;
+}
+
+.tooltip-top.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-top::after {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-top-color: rgba(14, 18, 31, 0.95);
+}
+
+.tooltip-bottom {
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(5px);
+    margin-top: 8px;
+}
+
+.tooltip-bottom.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-bottom::after {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-bottom-color: rgba(14, 18, 31, 0.95);
+}
+
+.tooltip-left {
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(-5px);
+    margin-right: 8px;
+}
+
+.tooltip-left.show {
+    transform: translateY(-50%) translateX(0);
+}
+
+.tooltip-left::after {
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-left-color: rgba(14, 18, 31, 0.95);
+}
+
+.tooltip-right {
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%) translateX(5px);
+    margin-left: 8px;
+}
+
+.tooltip-right.show {
+    transform: translateY(-50%) translateX(0);
+}
+
+.tooltip-right::after {
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-right-color: rgba(14, 18, 31, 0.95);
+}
+
+/* ============================================
+   Disabled States
+   ============================================ */
+
+.disabled-overlay {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.disabled-overlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(14, 18, 31, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 1;
+    border-radius: inherit;
+}
+
+/* Button disabled state */
+.btn:disabled,
+.btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn:disabled .btn-text,
+.btn.disabled .btn-text {
+    opacity: 0.7;
+}
+
+/* Form disabled state */
+.form-disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.form-disabled input,
+.form-disabled textarea,
+.form-disabled select,
+.form-disabled button {
+    cursor: not-allowed;
+}
+
+/* ============================================
+   Skeleton Loading (for content placeholders)
+   ============================================ */
+
+.skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(99, 199, 255, 0.1) 0%,
+        rgba(99, 199, 255, 0.2) 50%,
+        rgba(99, 199, 255, 0.1) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+    height: 1.5rem;
+    width: 60%;
+    margin-bottom: 1rem;
+}
+
+.skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.skeleton-button {
+    height: 40px;
+    width: 120px;
+    border-radius: 8px;
+}
+
+/* ============================================
+   Mobile Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: unset;
+    }
+    
+    .toast {
+        min-width: unset;
+        max-width: unset;
+        transform: translateY(-100px);
+    }
+    
+    .toast.show {
+        transform: translateY(0);
+    }
+    
+    .loading-overlay-message {
+        font-size: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .tooltip {
+        max-width: 200px;
+        font-size: 0.75rem;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    .progress-circle {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .progress-circle-text {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================
+   Loading States for Specific Elements
+   ============================================ */
+
+/* Table loading */
+.table-loading {
+    position: relative;
+    min-height: 200px;
+}
+
+.table-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(99, 199, 255, 0.3);
+    border-top-color: #63C7FF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Card loading skeleton */
+.card-skeleton {
+    padding: 1.5rem;
+}
+
+.card-skeleton .skeleton-title {
+    margin-bottom: 1rem;
+}
+
+.card-skeleton .skeleton-text {
+    margin-bottom: 0.75rem;
+}
+
+/* ============================================
+   Success/Error States
+   ============================================ */
+
+.state-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: 'Padauk', 'Noto Sans Myanmar', 'Segoe UI', sans-serif;
+}
+
+.state-indicator-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10B981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.state-indicator-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.state-indicator-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.state-indicator-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3B82F6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* ============================================
+   Pulse Animation (for attention)
+   ============================================ */
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* ============================================
+   Fade In/Out Animations
+   ============================================ */
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* ============================================
+   Loading Text Animation
+   ============================================ */
+
+.loading-dots::after {
+    content: '...';
+    animation: loading-dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes loading-dots {
+    0%, 20% {
+        content: '.';
+    }
+    40% {
+        content: '..';
+    }
+    60%, 100% {
+        content: '...';
+    }
+}
+

@@ -1,0 +1,4095 @@
+<!doctype html>
+<html lang="my">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AZone Bot Builder Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            padding: 20px 0;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+            border-right: 1px solid rgba(102, 126, 234, 0.2);
+            pointer-events: auto;
+        }
+        
+        .sidebar-brand {
+            padding: 25px 20px;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .sidebar-brand i {
+            color: #667eea;
+            margin-right: 8px;
+            -webkit-text-fill-color: #667eea;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-nav li {
+            margin: 5px 10px;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #b0b0b0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1001;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+        
+        .sidebar-nav a:focus {
+            outline: 2px solid rgba(102, 126, 234, 0.5);
+            outline-offset: 2px;
+        }
+        
+        .sidebar-nav a:hover {
+            background: rgba(102, 126, 234, 0.15);
+            color: #fff;
+            border-left-color: #667eea;
+            transform: translateX(5px);
+        }
+        
+        .sidebar-nav a.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.25) 0%, rgba(118, 75, 162, 0.25) 100%);
+            color: #fff;
+            border-left-color: #667eea;
+            box-shadow: 0 4px 15px rgba(86, 112, 226, 0.2);
+        }
+        
+        .sidebar-nav a i {
+            width: 22px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            margin-left: 260px;
+            padding: 40px;
+            min-height: 100vh;
+        }
+        
+        /* AZone Logo styling */
+        .azone-logo-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .azone-logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+        }
+        
+        .azone-logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .bot-builder-card {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 126, 234, 0.1);
+            padding: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .bot-builder-card h2 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .bot-builder-card h2 i {
+            color: #667eea;
+            margin-right: 10px;
+        }
+        
+        .bot-builder-card .text-muted {
+            color: #a0a0a0 !important;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #e0e0e0;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .form-label i {
+            color: #667eea;
+            margin-right: 8px;
+        }
+        
+        .form-control, .form-select {
+            background: rgba(22, 33, 62, 0.6);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: rgba(22, 33, 62, 0.8);
+            border-color: #667eea;
+            color: #fff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+        
+        .form-control::placeholder {
+            color: #888;
+        }
+        
+        .form-text {
+            color: #888 !important;
+        }
+        
+        .btn-add-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-add-step:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn-outline-secondary {
+            border-color: rgba(102, 126, 234, 0.5);
+            color: #b0b0b0;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            color: #fff;
+        }
+        
+        .card {
+            background: rgba(22, 33, 62, 0.6) !important;
+            border: 1px solid rgba(102, 126, 234, 0.3) !important;
+            border-radius: 12px !important;
+            color: #e0e0e0;
+        }
+        
+        .card-header {
+            background: rgba(102, 126, 234, 0.15) !important;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3) !important;
+            color: #fff !important;
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border-left: 4px solid #10b981;
+        }
+        
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .btn-outline-danger {
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+        }
+        
+        .btn-outline-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #fff;
+        }
+        
+        /* Table Styling for My Bots */
+        .table-dark {
+            background: rgba(22, 33, 62, 0.6) !important;
+            border-color: rgba(102, 126, 234, 0.3) !important;
+        }
+        
+        .table-dark thead th {
+            background: rgba(102, 126, 234, 0.2) !important;
+            border-color: rgba(102, 126, 234, 0.3) !important;
+            color: #fff !important;
+            font-weight: 600;
+        }
+        
+        .table-dark tbody tr {
+            border-color: rgba(102, 126, 234, 0.2) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .table-dark tbody tr:hover {
+            background: rgba(102, 126, 234, 0.15) !important;
+            transform: translateX(5px);
+        }
+        
+        .table-dark td {
+            color: #e0e0e0 !important;
+            vertical-align: middle;
+        }
+        
+        .table-dark .badge {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.8rem;
+        }
+        
+        .table-dark .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Scrollbar Styling */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
+        }
+        
+        /* Chat Widget Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 380px;
+            height: 500px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 999;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-widget.minimized {
+            height: 60px;
+        }
+        
+        .chat-widget-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%);
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .chat-widget-header h6 {
+            color: #fff;
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chat-widget-header h6 i {
+            color: #667eea;
+        }
+        
+        .chat-widget-toggle {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 5px;
+        }
+        
+        .chat-widget-toggle:hover {
+            color: #fff;
+        }
+        
+        .chat-widget-close {
+            background: none;
+            border: none;
+            color: #b0b0b0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 5px;
+            z-index: 1000;
+            position: relative;
+        }
+        
+        .chat-widget-close:hover {
+            color: #ff4444;
+            transform: scale(1.1);
+        }
+        
+        .chat-widget-close:active {
+            transform: scale(0.95);
+        }
+        
+        .chat-widget.hidden {
+            display: none !important;
+        }
+        
+        .chat-widget-show-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            z-index: 998;
+            font-size: 1.5rem;
+        }
+        
+        .chat-widget-show-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .chat-widget-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .chat-message.user {
+            align-items: flex-end;
+        }
+        
+        .chat-message.bot {
+            align-items: flex-start;
+        }
+        
+        .chat-message-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .chat-message.user .chat-message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .chat-message.bot .chat-message-bubble {
+            background: rgba(22, 33, 62, 0.8);
+            color: #e0e0e0;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-message-time {
+            font-size: 0.75rem;
+            color: #888;
+            padding: 0 5px;
+        }
+        
+        .chat-widget-input-container {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(22, 33, 62, 0.5);
+        }
+        
+        .chat-widget-input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .chat-widget-input {
+            flex: 1;
+            background: rgba(22, 33, 62, 0.8);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            color: #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-widget-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        
+        .chat-widget-input::placeholder {
+            color: #888;
+        }
+        
+        .chat-widget-send-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .chat-widget-send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .chat-widget-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .chat-widget-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-widget-body::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .chat-widget-body::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.5);
+            border-radius: 3px;
+        }
+        
+        .chat-widget-body::-webkit-scrollbar-thumb:hover {
+            background: rgba(102, 126, 234, 0.7);
+        }
+        
+        .chat-empty-state {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .chat-empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        /* Visual Flow Builder Styles */
+        .flow-node {
+            position: absolute;
+            min-width: 150px;
+            cursor: move;
+            z-index: 10;
+        }
+        
+        .flow-node-content {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9) 0%, rgba(118, 75, 162, 0.9) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .flow-node-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .flow-node.selected .flow-node-content {
+            border-color: #ffd700;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+        }
+        
+        .flow-node-start .flow-node-content {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.9) 0%, rgba(22, 163, 74, 0.9) 100%);
+        }
+        
+        .flow-node-message .flow-node-content {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.9) 100%);
+        }
+        
+        .flow-node-question .flow-node-content {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.9) 0%, rgba(245, 158, 11, 0.9) 100%);
+        }
+        
+        .flow-node-api_call .flow-node-content {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.9) 0%, rgba(124, 58, 237, 0.9) 100%);
+        }
+        
+        .flow-node-webhook .flow-node-content {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.9) 0%, rgba(219, 39, 119, 0.9) 100%);
+        }
+        
+        .flow-node-label {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .flow-node-actions {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .flow-node-action-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            transition: all 0.2s ease;
+        }
+        
+        .flow-node-action-btn:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: scale(1.1);
+        }
+        
+        .flow-node-edit-btn {
+            background: rgba(59, 130, 246, 0.9);
+        }
+        
+        .flow-node-edit-btn:hover {
+            background: rgba(59, 130, 246, 1);
+        }
+        
+        .flow-connection-line {
+            stroke: rgba(102, 126, 234, 0.6);
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+        }
+        
+        .flow-node-connector {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.8);
+            border: 2px solid white;
+            cursor: crosshair;
+            z-index: 20;
+        }
+        
+        .flow-node-connector.input {
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .flow-node-connector.output {
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .chat-widget {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+                bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-robot"></i> AZone Bot Builder
+        </div>
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('bot_builder') }}" class="{% if active_menu == 'bot-builder' %}active{% endif %}">
+                    <i class="fas fa-tools"></i> Bot Builder
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('analytics') }}" class="{% if active_menu == 'analytics' %}active{% endif %}">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('my_bots') }}" class="{% if active_menu == 'my-bots' %}active{% endif %}">
+                    <i class="fas fa-robot"></i> My Bots
+                </a>
+            </li>
+            {% if current_user and current_user.role == 'owner' %}
+            <li>
+                <a href="{{ url_for('user_management') }}" class="{% if active_menu == 'users' %}active{% endif %}">
+                    <i class="fas fa-users-cog"></i> User Management
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="azone-logo-header">
+                <img src="{{ url_for('static', filename='azone-logo.png') }}"
+                     alt="AZONE Logo"
+                     class="azone-logo-img">
+                <div class="azone-logo-text">
+                    <h4 class="text-white mb-1">Welcome back, {{ current_user.username if current_user else 'Guest' }}!</h4>
+                    <small class="text-muted">Role: {{ current_user.role if current_user else 'N/A' }}</small>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('bot_builder') }}" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+        {% set can_edit = current_user and current_user.role in ['owner', 'editor'] %}
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert" style="margin-bottom: 20px; animation: slideDown 0.3s ease;">
+                        <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'error' else 'info-circle' }}"></i> 
+                        <strong>{{ 'Success!' if category == 'success' else 'Error!' if category == 'error' else 'Warning!' }}</strong> 
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <style>
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+
+        {% if active_menu == 'bot-builder' %}
+        <!-- Bot Builder View -->
+        <div class="bot-builder-card">
+            <h2 class="mb-4">
+                <i class="fas fa-tools text-primary"></i> Bot Builder
+            </h2>
+            <p class="text-muted mb-4">Create and configure your chatbot with ease</p>
+
+            {% if not can_edit %}
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-lock"></i> သင့်အကောင့်သည် Viewer အဖြစ် သတ်မှတ်ထားပါသည်။ Bot အသစ်များကို ဖန်တီးခြင်း သို့မဟုတ် ပြင်ဆင်ခြင်းများ မပြုလုပ်နိုင်ဘဲ ကြည့်ရှုခြင်းသာ လုပ်နိုင်ပါသည်။
+            </div>
+            {% endif %}
+
+            <!-- Bot Template Library -->
+            {% if not bot_data %}
+            <div class="mb-4">
+                <div class="card bg-dark border-secondary">
+                    <div class="card-header bg-secondary">
+                        <h5 class="mb-0">
+                            <i class="fas fa-layer-group text-info"></i> Start from Template
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">Choose a pre-built template to get started quickly:</p>
+                        <div class="row" id="templateCards">
+                            {% if templates and templates|length > 0 %}
+                                {% for t in templates %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card bg-dark border-secondary h-100">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary">{{ t.name }}</h6>
+                                            <p class="card-text text-muted small">{{ t.description }}</p>
+                                            <button type="button" class="btn btn-sm btn-primary" onclick="useTemplate('{{ t.id }}')" {% if not can_edit %}disabled title="Viewer role များအတွက် Template သုံးခွင့်မရှိပါ"{% endif %}>Use</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="col-12">
+                                    <p class="text-muted text-center">No templates available. Click refresh to load templates.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-info mt-3" onclick="loadTemplates()">
+                            <i class="fas fa-sync"></i> Refresh Templates
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- View Toggle Buttons -->
+            <div class="mb-4">
+                <div class="btn-group" role="group" aria-label="View Toggle">
+                    <button type="button" class="btn btn-outline-primary active" id="formViewBtn" onclick="switchToFormView()">
+                        <i class="fas fa-list"></i> Form View
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="flowViewBtn" onclick="switchToFlowView()">
+                        <i class="fas fa-project-diagram"></i> Visual Flow View
+                    </button>
+                </div>
+            </div>
+
+            <!-- Form View Container -->
+            <div id="formViewContainer">
+            <!-- Bot Builder Form -->
+            <form id="botBuilderForm">
+                {% if bot_data %}
+                <div class="alert alert-info mb-4" role="alert">
+                    <i class="fas fa-info-circle"></i> Editing bot: <strong>{{ bot_data.bot_name }}</strong>
+                </div>
+                {% endif %}
+                
+                <!-- Bot Name Input -->
+                <div class="mb-4">
+                    <label for="botName" class="form-label">
+                        <i class="fas fa-tag"></i> Bot Name
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-control form-control-lg" 
+                        id="botName" 
+                        name="botName" 
+                        placeholder="Enter your bot name (e.g., Customer Support Bot)"
+                        value="{% if bot_data %}{{ bot_data.bot_name }}{% endif %}"
+                        required
+                    >
+                    <small class="form-text text-muted">Give your bot a unique and descriptive name</small>
+                </div>
+
+                <!-- Initial Greeting Textarea -->
+                <div class="mb-4">
+                    <label for="initialGreeting" class="form-label">
+                        <i class="fas fa-comment-dots"></i> Initial Greeting
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="initialGreeting" 
+                        name="initialGreeting" 
+                        rows="4" 
+                        placeholder="Enter the greeting message that your bot will send when users first interact (e.g., Hello! Welcome to our service. How can I help you today?)"
+                        required
+                    >{% if bot_data %}{{ bot_data.initial_greeting }}{% endif %}</textarea>
+                    <small class="form-text text-muted">This message will be sent automatically when a user starts a conversation</small>
+                </div>
+
+                <!-- Add New Step Button -->
+                <div class="mb-4">
+                    <button type="button" class="btn btn-add-step" id="addStepBtn" {% if not can_edit %}disabled title="Viewer role များအတွက် Step ထည့်ခွင့်မရှိပါ"{% endif %}>
+                        <i class="fas fa-plus-circle"></i> Add New Step
+                    </button>
+                    <small class="form-text text-muted d-block mt-2">Add conversation steps to build your bot's flow</small>
+                </div>
+
+                <!-- Steps Container (for dynamically added steps) -->
+                <div id="stepsContainer" class="mt-4">
+                    <!-- Steps will be added here dynamically -->
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-4 pt-4 border-top">
+                    <button type="submit" class="btn btn-primary btn-lg" {% if not can_edit %}disabled title="Viewer role များအတွက် Save ခွင့်မရှိပါ"{% endif %}>
+                        <i class="fas fa-save"></i> Save Bot Configuration
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg ms-2">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+            </div>
+            <!-- End Form View Container -->
+
+            <!-- Visual Flow View Container -->
+            <div id="flowViewContainer" style="display: none;">
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-project-diagram text-info"></i> Visual Flow Builder</h5>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-success me-2" onclick="addFlowNode('start')" {% if not can_edit %}disabled title="Viewer role များအတွက် Nodes မထည့်နိုင်ပါ"{% endif %}>
+                                <i class="fas fa-play"></i> Start
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary me-2" onclick="addFlowNode('message')" {% if not can_edit %}disabled title="Viewer role များအတွက် Nodes မထည့်နိုင်ပါ"{% endif %}>
+                                <i class="fas fa-comment"></i> Message
+                            </button>
+                            <button type="button" class="btn btn-sm btn-warning me-2" onclick="addFlowNode('question')" {% if not can_edit %}disabled title="Viewer role များအတွက် Nodes မထည့်နိုင်ပါ"{% endif %}>
+                                <i class="fas fa-question"></i> Question
+                            </button>
+                            <button type="button" class="btn btn-sm btn-info me-2" onclick="addFlowNode('api_call')" {% if not can_edit %}disabled title="Viewer role များအတွက် Nodes မထည့်နိုင်ပါ"{% endif %}>
+                                <i class="fas fa-plug"></i> API Call
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary me-2" onclick="addFlowNode('webhook')" {% if not can_edit %}disabled title="Viewer role များအတွက် Nodes မထည့်နိုင်ပါ"{% endif %}>
+                                <i class="fas fa-link"></i> Webhook
+                            </button>
+                            <button type="button" class="btn btn-sm btn-secondary" onclick="syncFlowToForm()" {% if not can_edit %}disabled title="Viewer role များအတွက် Sync မပြုလုပ်နိုင်ပါ"{% endif %}>
+                                <i class="fas fa-sync"></i> Sync to Form
+                            </button>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        Drag nodes to reposition. Click connectors to create connections. Right-click nodes to edit or delete.
+                    </div>
+                </div>
+                
+                <!-- Flow Canvas -->
+                <div id="flowCanvas" style="position: relative; width: 100%; height: 600px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 12px; overflow: hidden; cursor: grab;">
+                    <svg id="flowConnections" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="rgba(102, 126, 234, 0.8)" />
+                            </marker>
+                        </defs>
+                    </svg>
+                    <div id="flowNodesContainer" style="position: relative; width: 100%; height: 100%; z-index: 2;">
+                        <!-- Flow nodes will be rendered here -->
+                    </div>
+                </div>
+            </div>
+            <!-- End Visual Flow View Container -->
+        </div>
+        {% elif active_menu == 'analytics' %}
+        <!-- Analytics View -->
+        <div class="bot-builder-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-chart-bar text-primary"></i> Analytics Dashboard
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">View analytics and insights for your bots</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="/api/analytics/export?format=csv" class="btn btn-sm btn-success" target="_blank">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </a>
+                    <a href="/api/analytics/export?format=json" class="btn btn-sm btn-info" target="_blank">
+                        <i class="fas fa-file-code"></i> Export JSON
+                    </a>
+                </div>
+            </div>
+            
+            {% if stats and stats|length > 0 %}
+            <!-- Overall Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">
+                                <i class="fas fa-comments text-info"></i> Total Messages
+                            </h5>
+                            <h2 class="text-primary">
+                                {{ stats|sum(attribute='total_messages') }}
+                            </h2>
+                            <small class="text-muted">Last 30 days</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">
+                                <i class="fas fa-users text-success"></i> Unique Sessions
+                            </h5>
+                            <h2 class="text-success">
+                                {{ stats|sum(attribute='unique_sessions') }}
+                            </h2>
+                            <small class="text-muted">Last 30 days</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-dark border-secondary">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">
+                                <i class="fas fa-robot text-warning"></i> Active Bots
+                            </h5>
+                            <h2 class="text-warning">
+                                {{ stats|length }}
+                            </h2>
+                            <small class="text-muted">With conversations</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bot-Specific Statistics -->
+            <div class="card bg-dark border-secondary mb-4">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-line"></i> Bot Performance
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-robot"></i> Bot Name</th>
+                                    <th><i class="fas fa-comments"></i> Total Messages</th>
+                                    <th><i class="fas fa-users"></i> Unique Sessions</th>
+                                    <th><i class="fas fa-chart-bar"></i> Avg Messages/Session</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in stats %}
+                                <tr>
+                                    <td><strong>{{ stat.bot_name }}</strong></td>
+                                    <td>{{ stat.total_messages }}</td>
+                                    <td>{{ stat.unique_sessions }}</td>
+                                    <td>
+                                        {% if stat.unique_sessions > 0 %}
+                                            {{ "%.1f"|format(stat.total_messages / stat.unique_sessions) }}
+                                        {% else %}
+                                            0
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step-Level Analytics -->
+            {% if step_analytics %}
+            <div class="card bg-dark border-secondary mb-4">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-ol"></i> Step-Level Analytics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for bot_name, step_data in step_analytics.items() %}
+                        {% if step_data|length > 0 %}
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">{{ bot_name }}</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>Step Index</th>
+                                            <th>Step Type</th>
+                                            <th>Completions</th>
+                                            <th>Unique Sessions</th>
+                                            <th>Drop-off Rate</th>
+                                            <th>Avg Latency (s)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for step in step_data %}
+                                        <tr>
+                                            <td>{{ step.step_index }}</td>
+                                            <td><span class="badge bg-info">{{ step.step_type }}</span></td>
+                                            <td>{{ step.completion_count }}</td>
+                                            <td>{{ step.unique_sessions }}</td>
+                                            <td>
+                                                {% if step.drop_off_rate > 50 %}
+                                                    <span class="text-danger">{{ "%.1f"|format(step.drop_off_rate) }}%</span>
+                                                {% elif step.drop_off_rate > 25 %}
+                                                    <span class="text-warning">{{ "%.1f"|format(step.drop_off_rate) }}%</span>
+                                                {% else %}
+                                                    <span class="text-success">{{ "%.1f"|format(step.drop_off_rate) }}%</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if step.avg_latency > 0 %}
+                                                    {{ "%.3f"|format(step.avg_latency) }}
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Daily Analytics Chart (if available) -->
+            {% if bot_analytics %}
+            <div class="card bg-dark border-secondary">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt"></i> Daily Activity (Last 30 Days)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for bot_name, analytics in bot_analytics.items() %}
+                        {% if analytics|length > 0 %}
+                        <div class="mb-4">
+                            <h6 class="text-primary mb-3">{{ bot_name }}</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Messages</th>
+                                            <th>Sessions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for day in analytics[:10] %}
+                                        <tr>
+                                            <td>{{ day.date }}</td>
+                                            <td>{{ day.message_count }}</td>
+                                            <td>{{ day.session_count }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No analytics data available yet. Start using your bots to see statistics here.
+            </div>
+            {% endif %}
+        </div>
+        {% elif active_menu == 'my-bots' %}
+        <!-- My Bots View -->
+        <div class="bot-builder-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-robot text-primary"></i> My Bots
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">Manage all your created bots</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-info" onclick="document.getElementById('importFile').click()" title="Import Bot from JSON" {% if not can_edit %}disabled{% endif %}>
+                        <i class="fas fa-upload"></i> Import Bot
+                    </button>
+                    <input type="file" id="importFile" accept=".json,application/json" style="display: none;" onchange="importBot()" {% if not can_edit %}disabled{% endif %}>
+                    {% if bots and bots|length > 0 and can_edit %}
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="deleteSelectedBtn" onclick="window.deleteSelectedBots()" title="Delete Selected Bots" disabled>
+                        <i class="fas fa-trash-alt"></i> Delete Selected (<span id="selectedCount">0</span>)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-warning" onclick="window.deleteAllTestBots()" title="Delete All Test Bots">
+                        <i class="fas fa-broom"></i> Delete Test Bots
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if bots and bots|length > 0 %}
+            <!-- Bots Table -->
+            <div class="table-responsive">
+                <table class="table table-dark table-hover" id="myBotsTable">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width: 40px;">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)" title="Select All" {% if not can_edit %}disabled{% endif %}>
+                            </th>
+                            <th scope="col">
+                                <i class="fas fa-tag"></i> Bot Name
+                            </th>
+                            <th scope="col">
+                                <i class="fas fa-comment-dots"></i> Initial Greeting
+                            </th>
+                            <th scope="col">
+                                <i class="fas fa-list-ol"></i> Steps Count
+                            </th>
+                            <th scope="col">
+                                <i class="fas fa-cog"></i> Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bot in bots %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" class="bot-checkbox" value="{{ bot.bot_name }}" onchange="updateDeleteButton()" {% if not can_edit %}disabled{% endif %}>
+                            </td>
+                            <td>
+                                <strong>{{ bot.bot_name }}</strong>
+                            </td>
+                            <td>
+                                {% if bot.initial_greeting|length > 50 %}
+                                    {{ bot.initial_greeting[:50] }}...
+                                {% else %}
+                                    {{ bot.initial_greeting }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">{{ bot.steps|length }} steps</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('bot_builder') }}?bot_name={{ bot.bot_name|urlencode }}" class="btn btn-sm btn-primary" title="Edit Bot">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-success" onclick="window.exportBot('{{ bot.bot_name|replace("'", "\\'") }}')" title="Export Bot">
+                                        <i class="fas fa-download"></i> Export
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-info" onclick="window.showEmbedCode('{{ bot.bot_name|replace("'", "\\'") }}')" title="Get Embed Code">
+                                        <i class="fas fa-code"></i> Get Embed Code
+                                    </button>
+                                    {% if can_edit %}
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="window.deleteBot('{{ bot.bot_name|replace("'", "\\'") }}')" title="Delete Bot">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle"></i> No bots found. Create your first bot in the Bot Builder section!
+            </div>
+            {% endif %}
+        </div>
+        {% elif active_menu == 'users' %}
+        <!-- User Management View -->
+        <div class="bot-builder-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="mb-0">
+                        <i class="fas fa-users-cog text-primary"></i> User Management
+                    </h2>
+                    <p class="text-muted mb-0 mt-2">Owner အတွက်သာ role များ ပြောင်းနိုင်ပါသည်။</p>
+                </div>
+                <a href="{{ url_for('register') }}" class="btn btn-sm btn-success">
+                    <i class="fas fa-user-plus"></i> Create New User
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-dark table-hover">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge bg-info text-dark text-uppercase">{{ user.role }}</span></td>
+                            <td>{{ user.created_at }}</td>
+                            <td>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <form class="d-flex gap-2" method="POST" action="{{ url_for('update_user_role') }}">
+                                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                                        <select name="role" class="form-select form-select-sm" style="max-width: 150px;">
+                                            <option value="viewer" {% if user.role == 'viewer' %}selected{% endif %}>Viewer</option>
+                                            <option value="editor" {% if user.role == 'editor' %}selected{% endif %}>Editor</option>
+                                            <option value="owner" {% if user.role == 'owner' %}selected{% endif %}>Owner</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-save"></i> Update
+                                        </button>
+                                    </form>
+                                    {% if user.id != current_user.id %}
+                                    <form method="POST" action="{{ url_for('delete_user', user_id=user.id) }}" onsubmit="return confirm('{{ user.username }} ကို ဖျက်မှာ သေချာပါသလား?');" style="margin: 0;">
+                                        <button type="submit" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <button type="button" class="btn btn-sm btn-secondary" disabled title="သင့်ကိုယ်တိုင် ဖျက်လို့မရပါ">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="alert alert-info mt-4 mb-0">
+                <i class="fas fa-info-circle"></i> Default admin: username <strong>admin</strong>, password <strong>admin123</strong>. လုံခြုံရေးအတွက် ပြောင်းလဲရမည်။
+            </div>
+        </div>
+        {% else %}
+        <!-- Default View (Bot Builder) -->
+        <div class="bot-builder-card">
+            <h2 class="mb-4">
+                <i class="fas fa-tools text-primary"></i> Bot Builder
+            </h2>
+            <p class="text-muted mb-4">Create and configure your chatbot with ease</p>
+
+            <!-- Version Status Banner -->
+            {% if bot_data and bot_data.bot_name %}
+            <div class="alert alert-info mb-4 d-flex justify-content-between align-items-center" role="alert">
+                <div>
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Editing:</strong> {{ bot_data.bot_name }}
+                    {% if bot_data.is_live %}
+                        <span class="badge bg-success ms-2"><i class="fas fa-check-circle"></i> Live (v{{ bot_data.version_number }})</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark ms-2"><i class="fas fa-edit"></i> Draft (v{{ bot_data.version_number }})</span>
+                    {% endif %}
+                    {% if draft_data and live_data %}
+                        <span class="badge bg-secondary ms-2">Live: v{{ live_data.version_number }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if draft_data and not bot_data.is_live %}
+                    <button type="button" class="btn btn-sm btn-success me-2" onclick="window.publishDraft('{{ bot_data.bot_name|replace("'", "\\'") }}')" {% if not can_edit %}disabled{% endif %}>
+                        <i class="fas fa-rocket"></i> Publish Draft
+                    </button>
+                    <button type="button" class="btn btn-sm btn-info" onclick="window.testDraft('{{ bot_data.bot_name|replace("'", "\\'") }}')" {% if not can_edit %}disabled{% endif %}>
+                        <i class="fas fa-vial"></i> Test Draft
+                    </button>
+                    {% elif live_data and not bot_data.is_live %}
+                    <a href="{{ url_for('bot_builder', bot_name=bot_data.bot_name) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-eye"></i> View Live
+                    </a>
+                    {% endif %}
+                    {% if versions|length > 1 %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="window.showVersionHistory('{{ bot_data.bot_name|replace("'", "\\'") }}')">
+                        <i class="fas fa-history"></i> Version History
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Bot Builder Form -->
+            <form id="botBuilderForm" action="{{ url_for('save_bot') }}" method="POST">
+                <!-- Bot Name Input -->
+                <div class="mb-4">
+                    <label for="botName" class="form-label">
+                        <i class="fas fa-tag"></i> Bot Name
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-control form-control-lg" 
+                        id="botName" 
+                        name="botName" 
+                        placeholder="Enter your bot name (e.g., Customer Support Bot)"
+                        value="{% if bot_data %}{{ bot_data.bot_name }}{% endif %}"
+                        required
+                    >
+                    <small class="form-text text-muted">Give your bot a unique and descriptive name</small>
+                </div>
+
+                <!-- Initial Greeting Textarea -->
+                <div class="mb-4">
+                    <label for="initialGreeting" class="form-label">
+                        <i class="fas fa-comment-dots"></i> Initial Greeting
+                    </label>
+                    <textarea 
+                        class="form-control" 
+                        id="initialGreeting" 
+                        name="initialGreeting" 
+                        rows="4" 
+                        placeholder="Enter the greeting message that your bot will send when users first interact (e.g., Hello! Welcome to our service. How can I help you today?)"
+                        required
+                    ></textarea>
+                    <small class="form-text text-muted">This message will be sent automatically when a user starts a conversation</small>
+                </div>
+
+                <!-- Add New Step Button -->
+                <div class="mb-4">
+                    <button type="button" class="btn btn-add-step" id="addStepBtn" {% if not can_edit %}disabled title="Viewer role များအတွက် Step ထည့်ခွင့်မရှိပါ"{% endif %}>
+                        <i class="fas fa-plus-circle"></i> Add New Step
+                    </button>
+                    <small class="form-text text-muted d-block mt-2">Add conversation steps to build your bot's flow</small>
+                </div>
+
+                <!-- Steps Container (for dynamically added steps) -->
+                <div id="stepsContainer" class="mt-4">
+                    <!-- Steps will be added here dynamically -->
+                </div>
+
+                <!-- Hidden input for steps JSON (will be populated by JavaScript) -->
+                <input type="hidden" id="stepsJson" name="stepsJson" value="[]">
+
+                <!-- Submit Button -->
+                <div class="mt-4 pt-4 border-top">
+                    <button type="submit" class="btn btn-primary btn-lg" {% if not can_edit %}disabled title="Viewer role များအတွက် Save ခွင့်မရှိပါ"{% endif %}>
+                        <i class="fas fa-save"></i> Save as Draft
+                    </button>
+                    {% if bot_data and bot_data.bot_name %}
+                    <button type="button" class="btn btn-success btn-lg ms-2" onclick="window.saveAndPublish()" {% if not can_edit %}disabled title="Viewer role များအတွက် Publish ခွင့်မရှိပါ"{% endif %}>
+                        <i class="fas fa-rocket"></i> Save & Publish
+                    </button>
+                    <button type="button" class="btn btn-danger btn-lg ms-2" onclick="window.deleteCurrentBot('{{ bot_data.bot_name|replace("'", "\\'") }}')" {% if not can_edit %}disabled title="Viewer role များအတွက် Delete ခွင့်မရှိပါ"{% endif %}>
+                        <i class="fas fa-trash"></i> Delete Bot
+                    </button>
+                    {% endif %}
+                    <button type="button" class="btn btn-outline-secondary btn-lg ms-2" onclick="window.location.reload()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+    </div>
+    {% endif %}
+</div>
+
+    <!-- Embed Code Modal -->
+    <div class="modal fade" id="embedCodeModal" tabindex="-1" aria-labelledby="embedCodeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="background-color: #1A233A; color: #F0F4F8;">
+                <div class="modal-header" style="border-bottom: 1px solid #3B5D9A;">
+                    <h5 class="modal-title" id="embedCodeModalLabel">
+                        <i class="fas fa-code"></i> Embed Code for <span id="embedBotName"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted mb-3">
+                        Copy the code below and paste it into your website's HTML. The chat widget will appear on your page.
+                    </p>
+                    <div class="mb-3">
+                        <label for="embedCodeText" class="form-label">Embed Code:</label>
+                        <textarea 
+                            class="form-control" 
+                            id="embedCodeText" 
+                            rows="15" 
+                            readonly 
+                            style="background-color: #0E121F; color: #F0F4F8; border: 1px solid #3B5D9A; font-family: 'Courier New', monospace; font-size: 12px;"
+                        ></textarea>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary" onclick="copyEmbedCode()">
+                            <i class="fas fa-copy"></i> Copy Code
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                    <div id="copySuccessMessage" class="alert alert-success mt-3" style="display: none;">
+                        <i class="fas fa-check-circle"></i> Code copied to clipboard!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Chat Widget (Only show in Bot Builder view) -->
+    {% if active_menu == 'bot-builder' or not active_menu %}
+    <div class="chat-widget" id="chatWidget">
+        <div class="chat-widget-header" onclick="window.toggleChatWidget()">
+            <h6>
+                <i class="fas fa-comments"></i> Test Chat
+            </h6>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="chat-widget-toggle" onclick="event.stopPropagation(); event.preventDefault(); window.toggleChatWidget(); return false;" title="Minimize/Maximize" type="button">
+                    <i class="fas fa-minus" id="chatToggleIcon"></i>
+                </button>
+                <button class="chat-widget-close" onclick="event.stopPropagation(); event.preventDefault(); window.closeChatWidget(); return false;" title="Close Chat" type="button">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="chat-widget-body" id="chatWidgetBody">
+            <div class="chat-empty-state" id="chatEmptyState">
+                <i class="fas fa-robot"></i>
+                <p>Start chatting to test your bot!</p>
+                <small>Enter your bot name in the form above first</small>
+            </div>
+        </div>
+        <div class="chat-widget-input-container">
+            <div class="chat-widget-input-wrapper">
+                <input 
+                    type="text" 
+                    class="chat-widget-input" 
+                    id="chatInput" 
+                    placeholder="Type a message..."
+                    onkeypress="handleChatKeyPress(event)"
+                >
+                <button class="chat-widget-send-btn" id="chatSendBtn" onclick="sendChatMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+                <button class="chat-widget-send-btn" id="chatResetBtn" onclick="resetChatSession()" title="Reset Chat" style="margin-left: 5px; background: rgba(239, 68, 68, 0.8);">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating button to show chat widget if hidden -->
+    <button class="chat-widget-show-btn" id="chatWidgetShowBtn" onclick="window.showChatWidget(); return false;" style="display: none;" title="Show Test Chat" type="button">
+        <i class="fas fa-comments"></i>
+    </button>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Step counter for tracking step numbers
+        let stepCount = 0;
+        const canEditBots = {{ 'true' if can_edit else 'false' }};
+        window.canEditBots = canEditBots;
+        
+        // Define chat widget functions early to avoid reference errors
+        /**
+         * Toggle chat widget minimize/maximize
+         */
+        window.toggleChatWidget = function() {
+            const widget = document.getElementById('chatWidget');
+            if (!widget || widget.classList.contains('hidden')) {
+                return;
+            }
+            const icon = document.getElementById('chatToggleIcon');
+            const body = document.getElementById('chatWidgetBody');
+            const inputContainer = document.querySelector('.chat-widget-input-container');
+            
+            if (widget.classList.contains('minimized')) {
+                widget.classList.remove('minimized');
+                if (icon) icon.className = 'fas fa-minus';
+                if (body) body.style.display = 'flex';
+                if (inputContainer) inputContainer.style.display = 'block';
+            } else {
+                widget.classList.add('minimized');
+                if (icon) icon.className = 'fas fa-plus';
+                if (body) body.style.display = 'none';
+                if (inputContainer) inputContainer.style.display = 'none';
+            }
+        };
+        
+        /**
+         * Close chat widget completely
+         */
+        window.closeChatWidget = function() {
+            const widget = document.getElementById('chatWidget');
+            const showBtn = document.getElementById('chatWidgetShowBtn');
+            
+            if (widget) {
+                widget.classList.add('hidden');
+                widget.style.display = 'none';
+            }
+            if (showBtn) {
+                showBtn.style.display = 'flex';
+            }
+        };
+        
+        /**
+         * Show chat widget (if hidden)
+         */
+        window.showChatWidget = function() {
+            const widget = document.getElementById('chatWidget');
+            const showBtn = document.getElementById('chatWidgetShowBtn');
+            
+            if (widget) {
+                widget.classList.remove('hidden');
+                widget.style.display = 'flex';
+                widget.classList.remove('minimized');
+                const icon = document.getElementById('chatToggleIcon');
+                const body = document.getElementById('chatWidgetBody');
+                const inputContainer = document.querySelector('.chat-widget-input-container');
+                if (icon) icon.className = 'fas fa-minus';
+                if (body) body.style.display = 'flex';
+                if (inputContainer) inputContainer.style.display = 'block';
+            }
+            if (showBtn) {
+                showBtn.style.display = 'none';
+            }
+        };
+
+        /**
+         * Function to add a new conversation step
+         * Creates a step template with Type Selection and Content Input
+         */
+        function addNewStep() {
+            stepCount++;
+            const stepsContainer = document.getElementById('stepsContainer');
+            
+            // Create unique IDs for this step
+            const stepId = 'step-' + stepCount;
+            const typeSelectId = 'stepType-' + stepCount;
+            const contentInputId = 'stepContent-' + stepCount;
+            
+            // Create step card element
+            const stepCard = document.createElement('div');
+            stepCard.className = 'card mb-3 step-card';
+            stepCard.id = stepId;
+            stepCard.setAttribute('data-step-number', stepCount);
+            
+            // Step Template HTML (Enhanced with Advanced Features)
+            stepCard.innerHTML = `
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list-ol text-primary"></i> Step ${stepCount}
+                    </h5>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-step" onclick="removeStep('${stepId}')">
+                        <i class="fas fa-trash"></i> Remove
+                    </button>
+                </div>
+                <div class="card-body">
+                    <!-- Type Selection Dropdown -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-tag"></i> Step Type
+                        </label>
+                        <select class="form-select step-type-select" id="${typeSelectId}" name="stepType[]" onchange="updateContentInput('${stepId}', '${typeSelectId}', '${contentInputId}')" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="message">Message</option>
+                            <option value="question">Question</option>
+                            <option value="api_call">External API Call</option>
+                            <option value="webhook">Webhook</option>
+                        </select>
+                        <small class="form-text text-muted">Choose step type: Message, Question, or External API Call</small>
+                    </div>
+                    
+                    <!-- Content Input Field (Dynamic based on Type) -->
+                    <div class="mb-3" id="contentField-${stepCount}">
+                        <label class="form-label" for="${contentInputId}">
+                            <i class="fas fa-comment"></i> Content
+                        </label>
+                        <textarea 
+                            class="form-control step-content-input" 
+                            id="${contentInputId}" 
+                            name="stepContent[]" 
+                            rows="3"
+                            placeholder="Enter content based on selected type..."
+                            required
+                        ></textarea>
+                        <small class="form-text text-muted step-content-hint">Select a type first to see the appropriate placeholder</small>
+                    </div>
+                    
+                    <!-- API Configuration Fields (Shown only for API Call type) -->
+                    <div id="apiConfigFields-${stepCount}" style="display: none;">
+                        <div class="card bg-dark border-secondary mb-3">
+                            <div class="card-header bg-secondary">
+                                <h6 class="mb-0"><i class="fas fa-plug"></i> API Configuration</h6>
+                            </div>
+                            <div class="card-body">
+                                <!-- API URL -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="apiUrl-${stepCount}">
+                                        <i class="fas fa-link"></i> API URL
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="apiUrl-${stepCount}"
+                                        placeholder="https://api.example.com/endpoint"
+                                    >
+                                    <small class="form-text text-muted">Enter the full API endpoint URL. Use variables: {{variable_name}}</small>
+                                </div>
+                                
+                                <!-- HTTP Method -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="apiMethod-${stepCount}">
+                                        <i class="fas fa-exchange-alt"></i> HTTP Method
+                                    </label>
+                                    <select class="form-select" id="apiMethod-${stepCount}">
+                                        <option value="GET">GET</option>
+                                        <option value="POST" selected>POST</option>
+                                        <option value="PUT">PUT</option>
+                                    </select>
+                                    <small class="form-text text-muted">Select the HTTP method for the API call</small>
+                                </div>
+                                
+                                <!-- Headers (JSON) -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="apiHeaders-${stepCount}">
+                                        <i class="fas fa-heading"></i> Headers (JSON)
+                                    </label>
+                                    <textarea 
+                                        class="form-control font-monospace" 
+                                        id="apiHeaders-${stepCount}"
+                                        rows="3"
+                                        placeholder='{"Authorization": "Bearer {{api_token}}", "Content-Type": "application/json"}'
+                                    ></textarea>
+                                    <small class="form-text text-muted">Enter headers as JSON. Use variables: {{variable_name}}</small>
+                                </div>
+                                
+                                <!-- Body (JSON) -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="apiBody-${stepCount}">
+                                        <i class="fas fa-code"></i> Body (JSON)
+                                    </label>
+                                    <textarea 
+                                        class="form-control font-monospace" 
+                                        id="apiBody-${stepCount}"
+                                        rows="4"
+                                        placeholder='{"name": "{{user_name}}", "email": "{{user_email}}"}'
+                                    ></textarea>
+                                    <small class="form-text text-muted">Enter request body as JSON (for POST/PUT). Use variables: {{variable_name}}</small>
+                                </div>
+                                
+                                <!-- Response Message Template -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="apiResponseTemplate-${stepCount}">
+                                        <i class="fas fa-reply"></i> Response Message Template
+                                    </label>
+                                    <textarea 
+                                        class="form-control" 
+                                        id="apiResponseTemplate-${stepCount}"
+                                        rows="2"
+                                        placeholder="API call successful! Response: {{api_response}}"
+                                    ></textarea>
+                                    <small class="form-text text-muted">Message to show after API call. Use {{api_response}} for API response data</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Options (Collapsible) -->
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#advancedOptions-${stepCount}" aria-expanded="false">
+                            <i class="fas fa-cog"></i> Advanced Options
+                        </button>
+                    </div>
+                    
+                    <div class="collapse" id="advancedOptions-${stepCount}">
+                        <div class="card card-body bg-dark border border-secondary">
+                            <!-- Triggers (Keywords that trigger this step) -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-key"></i> Triggers (Keywords)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control form-control-sm" 
+                                    id="stepTriggers-${stepCount}"
+                                    placeholder="Enter keywords separated by commas (e.g., help, support, assistance)"
+                                >
+                                <small class="form-text text-muted">Keywords that will trigger this step. Leave empty to use default flow.</small>
+                            </div>
+                            
+                            <!-- Save Answer to Variable (For Questions) -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-database"></i> Save Answer to Variable
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control form-control-sm" 
+                                    id="stepVariable-${stepCount}"
+                                    placeholder="Variable name (e.g., user_name, email)"
+                                >
+                                <small class="form-text text-muted">Save user's answer to a variable for later use. Use in content with {variable_name}</small>
+                            </div>
+                            
+                            <!-- Condition (When to show this step) -->
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-filter"></i> Condition
+                                </label>
+                                <select class="form-select form-select-sm" id="stepCondition-${stepCount}">
+                                    <option value="">Always (No condition)</option>
+                                    <option value="variable_equals">Variable Equals</option>
+                                    <option value="step_completed">Step Completed</option>
+                                    <option value="contains_keyword">Contains Keyword</option>
+                                </select>
+                                <input 
+                                    type="text" 
+                                    class="form-control form-control-sm mt-2" 
+                                    id="stepConditionValue-${stepCount}"
+                                    placeholder="Condition value (e.g., variable_name=value)"
+                                    style="display: none;"
+                                >
+                                <small class="form-text text-muted">Set condition for when this step should be executed</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listener for condition select
+            setTimeout(() => {
+                const conditionSelect = document.getElementById(`stepCondition-${stepCount}`);
+                const conditionValue = document.getElementById(`stepConditionValue-${stepCount}`);
+                if (conditionSelect) {
+                    conditionSelect.addEventListener('change', function() {
+                        if (this.value) {
+                            conditionValue.style.display = 'block';
+                        } else {
+                            conditionValue.style.display = 'none';
+                        }
+                    });
+                }
+            }, 100);
+            
+            // Append step card to container
+            stepsContainer.appendChild(stepCard);
+            
+            // Scroll to the new step for better UX
+            stepCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /**
+         * Function to update content input field based on selected type
+         * @param {string} stepId - The ID of the step card
+         * @param {string} typeSelectId - The ID of the type select dropdown
+         * @param {string} contentInputId - The ID of the content input field
+         */
+        function updateContentInput(stepId, typeSelectId, contentInputId) {
+            const typeSelect = document.getElementById(typeSelectId);
+            const contentInput = document.getElementById(contentInputId);
+            const hintText = contentInput.parentElement.querySelector('.step-content-hint');
+            const stepNumber = stepId.replace('step-', '');
+            
+            // Get API config fields container
+            const apiConfigFields = document.getElementById(`apiConfigFields-${stepNumber}`);
+            const contentField = document.getElementById(`contentField-${stepNumber}`);
+            
+            const selectedType = typeSelect.value;
+            
+            if (selectedType === 'message') {
+                // For Message type: Text input for bot message
+                if (contentInput.tagName === 'TEXTAREA') {
+                    contentInput.placeholder = 'Enter the message that the bot will send (e.g., Hello! How can I help you today?)';
+                }
+                contentInput.required = true;
+                if (contentField) contentField.style.display = 'block';
+                if (apiConfigFields) apiConfigFields.style.display = 'none';
+                if (hintText) {
+                    hintText.textContent = 'Enter the message content that your bot will send to users';
+                }
+            } else if (selectedType === 'question') {
+                // For Question type: Text input for question
+                if (contentInput.tagName === 'TEXTAREA') {
+                    contentInput.placeholder = 'Enter the question that the bot will ask (e.g., What is your name?)';
+                }
+                contentInput.required = true;
+                if (contentField) contentField.style.display = 'block';
+                if (apiConfigFields) apiConfigFields.style.display = 'none';
+                if (hintText) {
+                    hintText.textContent = 'Enter the question that your bot will ask users';
+                }
+            } else if (selectedType === 'api_call') {
+                // For API Call type: Show API configuration fields
+                contentInput.required = false;
+                if (contentField) contentField.style.display = 'none';
+                if (apiConfigFields) apiConfigFields.style.display = 'block';
+                if (hintText) {
+                    hintText.textContent = 'Configure external API call settings below';
+                }
+            } else if (selectedType === 'webhook') {
+                // For Webhook type: Show webhook configuration fields (same as API call)
+                contentInput.required = false;
+                if (contentField) contentField.style.display = 'none';
+                if (apiConfigFields) apiConfigFields.style.display = 'block';
+                if (hintText) {
+                    hintText.textContent = 'Configure webhook settings below';
+                }
+            } else {
+                // Default: Clear placeholder
+                if (contentInput.tagName === 'TEXTAREA') {
+                    contentInput.placeholder = 'Enter content based on selected type...';
+                }
+                contentInput.required = false;
+                if (contentField) contentField.style.display = 'block';
+                if (apiConfigFields) apiConfigFields.style.display = 'none';
+                if (hintText) {
+                    hintText.textContent = 'Select a type first to see the appropriate placeholder';
+                }
+            }
+            
+            // Clear the input when type changes
+            if (selectedType !== 'api_call' && selectedType !== 'webhook') {
+                contentInput.value = '';
+            }
+        }
+
+        /**
+         * Function to remove a step
+         * @param {string} stepId - The ID of the step card to remove
+         */
+        function removeStep(stepId) {
+            const stepCard = document.getElementById(stepId);
+            if (stepCard && confirm('Are you sure you want to remove this step?')) {
+                stepCard.remove();
+                // Optionally renumber remaining steps
+                renumberSteps();
+            }
+        }
+
+        /**
+         * Function to renumber steps after removal
+         */
+        function renumberSteps() {
+            const stepCards = document.querySelectorAll('.step-card');
+            stepCards.forEach((card, index) => {
+                const stepNumber = index + 1;
+                const header = card.querySelector('.card-header h5');
+                if (header) {
+                    header.innerHTML = `<i class="fas fa-list-ol text-primary"></i> Step ${stepNumber}`;
+                }
+                card.setAttribute('data-step-number', stepNumber);
+            });
+        }
+
+        /**
+         * Show alert message (Success/Error)
+         */
+        window.showAlertMessage = function(message, type = 'success') {
+            // Remove existing alerts
+            const existingAlerts = document.querySelectorAll('.custom-alert-message');
+            existingAlerts.forEach(alert => alert.remove());
+            
+            // Create alert element
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `custom-alert-message alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 10000;
+                min-width: 300px;
+                max-width: 500px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${icon}"></i> 
+                <strong>${type === 'success' ? 'Success!' : 'Error!'}</strong> 
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            // Add to page
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 5 seconds for success, 8 seconds for error
+            setTimeout(() => {
+                alertDiv.classList.remove('show');
+                setTimeout(() => alertDiv.remove(), 300);
+            }, type === 'success' ? 5000 : 8000);
+        }
+        
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Load existing bot data for editing
+        {% if bot_data and bot_data.steps %}
+        function loadExistingBotSteps() {
+            const steps = {{ bot_data.steps|tojson|safe }};
+            const stepsContainer = document.getElementById('stepsContainer');
+            
+            if (steps && steps.length > 0) {
+                steps.forEach((step, index) => {
+                    stepCount++;
+                    const stepId = 'step-' + stepCount;
+                    const typeSelectId = 'stepType-' + stepCount;
+                    const contentInputId = 'stepContent-' + stepCount;
+                    
+                    const stepCard = document.createElement('div');
+                    stepCard.className = 'card mb-3 step-card';
+                    stepCard.id = stepId;
+                    stepCard.setAttribute('data-step-number', stepCount);
+                    
+                    const stepType = step.type || '';
+                    const stepContent = (step.content || '').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    
+                    stepCard.innerHTML = `
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <i class="fas fa-list-ol text-primary"></i> Step ${stepCount}
+                            </h5>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-step" onclick="removeStep('${stepId}')">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-tag"></i> Step Type
+                                </label>
+                                <select class="form-select step-type-select" id="${typeSelectId}" name="stepType[]" onchange="updateContentInput('${stepId}', '${typeSelectId}', '${contentInputId}')" required>
+                                    <option value="">-- Select Type --</option>
+                                    <option value="message" ${stepType === 'message' ? 'selected' : ''}>Message</option>
+                                    <option value="question" ${stepType === 'question' ? 'selected' : ''}>Question</option>
+                                    <option value="api_call" ${stepType === 'api_call' ? 'selected' : ''}>External API Call</option>
+                                </select>
+                                <small class="form-text text-muted">Choose step type: Message, Question, or External API Call</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="${contentInputId}">
+                                    <i class="fas fa-comment"></i> Content
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control step-content-input" 
+                                    id="${contentInputId}" 
+                                    name="stepContent[]" 
+                                    value="${stepContent}"
+                                    placeholder="Enter content based on selected type..."
+                                    required
+                                >
+                                <small class="form-text text-muted step-content-hint">${stepType === 'message' ? 'Enter the message content that your bot will send to users' : stepType === 'question' ? 'Enter the question that your bot will ask users' : 'Select a type first to see the appropriate placeholder'}</small>
+                            </div>
+                        </div>
+                    `;
+                    
+                    stepsContainer.appendChild(stepCard);
+                });
+            }
+        }
+        {% endif %}
+
+        // Initialize event listeners when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const addStepBtn = document.getElementById('addStepBtn');
+            const botBuilderForm = document.getElementById('botBuilderForm');
+            
+            {% if bot_data and bot_data.steps %}
+            // Load existing bot steps for editing
+            loadExistingBotSteps();
+            {% endif %}
+            
+            // Attach click event to "Add New Step" button
+            if (addStepBtn) {
+                addStepBtn.addEventListener('click', function() {
+                    if (!window.canEditBots) {
+                        window.showAlertMessage('Viewer role အတွက် bot များကို ပြင်ဆင်ခွင့်မရှိပါ။', 'error');
+                        return;
+                    }
+                    addNewStep();
+                });
+            }
+            
+            // Form submission handler
+            if (botBuilderForm) {
+                botBuilderForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // Collect form data
+                    const botName = document.getElementById('botName')?.value.trim() || '';
+                    const initialGreeting = document.getElementById('initialGreeting')?.value.trim() || '';
+                    
+                    // Validate required fields
+                    if (!botName) {
+                        alert('Please enter a bot name');
+                        document.getElementById('botName').focus();
+                        return;
+                    }
+                    
+                    if (!initialGreeting) {
+                        alert('Please enter an initial greeting');
+                        document.getElementById('initialGreeting').focus();
+                        return;
+                    }
+                    
+                    // Collect all steps data using shared function (defined above)
+                    const steps = collectAllSteps();
+                    
+                    // Validate steps (check for API/webhook URL requirements)
+                    for (let i = 0; i < steps.length; i++) {
+                        const step = steps[i];
+                        if (step.type === 'api_call' && (!step.api_config || !step.api_config.url)) {
+                            alert(`Step ${i + 1}: API URL is required for API Call type`);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                            return;
+                        }
+                        if (step.type === 'webhook' && (!step.webhook_config || !step.webhook_config.url)) {
+                            alert(`Step ${i + 1}: Webhook URL is required for Webhook type`);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
+                            return;
+                        }
+                    }
+                    
+                    // Convert steps to JSON string
+                    const stepsJson = JSON.stringify(steps);
+                    
+                    // Set in hidden input if it exists (may not exist in all views)
+                    const stepsJsonInput = document.getElementById('stepsJson');
+                    if (stepsJsonInput) {
+                        stepsJsonInput.value = stepsJson;
+                    }
+                    
+                    // Create form data object for POST request
+                    const formData = {
+                        botName: botName,
+                        initialGreeting: initialGreeting,
+                        stepsJson: stepsJson,
+                        publish: false  // Default to draft
+                    };
+                    
+                    console.log('Submitting Bot Configuration:', formData);
+                    
+                    // Show loading state
+                    const submitBtn = botBuilderForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    
+                    // Submit form data via fetch API (POST request)
+                    fetch('{{ url_for("save_bot") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    })
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        console.log('Response ok:', response.ok);
+                        
+                        // Check if response is ok
+                        if (!response.ok) {
+                            // Try to get error message from JSON
+                            return response.json().then(data => {
+                                throw new Error(data.error || `Server error: ${response.status}`);
+                            }).catch(() => {
+                                throw new Error(`Server error: ${response.status}`);
+                            });
+                        }
+                        
+                        // Parse JSON response
+                        return response.json().then(data => {
+                            console.log('Response data:', data);
+                            
+                            if (data && data.success) {
+                                // Success - show success message
+                                const successMsg = data.message || `Bot "${botName}" has been saved successfully!`;
+                                window.showAlertMessage(successMsg, 'success');
+                                
+                                // Reset chat session to allow new conversation
+                                chatSessionData = {};
+                                chatBotName = botName; // Update bot name for chat
+                                
+                                // Reset button
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                                
+                                console.log('Bot saved successfully!');
+                            } else {
+                                // Error - show error message
+                                const errorMsg = (data && data.error) || 'Failed to save bot';
+                                window.showAlertMessage(errorMsg, 'error');
+                                
+                                // Reset button
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = originalBtnText;
+                            }
+                        }).catch(err => {
+                            console.error('JSON parse error:', err);
+                            throw new Error('Invalid response from server');
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = originalBtnText;
+                        window.showAlertMessage('Error: ' + error.message + '\n\nPlease check the console for more details.', 'error');
+                    });
+                    });
+            }
+        });
+
+        // ========== Chat Widget JavaScript ==========
+        
+        // Chat session data
+        let chatSessionData = {};
+        let chatBotName = '';
+        let chatSessionId = null;
+        
+        /**
+         * Reset chat session to start new conversation
+         */
+        window.resetChatSession = function() {
+            chatSessionData = {};
+            chatSessionId = null; // Reset session ID
+            const chatWidgetBody = document.getElementById('chatWidgetBody');
+            const chatEmptyState = document.getElementById('chatEmptyState');
+            
+            // Clear chat history
+            const messages = chatWidgetBody.querySelectorAll('.chat-message');
+            messages.forEach(msg => msg.remove());
+            
+            // Show empty state
+            if (chatEmptyState) {
+                chatEmptyState.style.display = 'flex';
+            }
+            
+            console.log('Chat session reset');
+        };
+        
+        /**
+         * Export bot configuration
+         */
+        window.exportBot = async function(botName) {
+            try {
+                const response = await fetch(`/api/bot/export/${encodeURIComponent(botName)}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Download as JSON file
+                    const blob = new Blob([JSON.stringify(data.bot_config, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${botName}_config.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    window.showAlertMessage(`Bot "${botName}" exported successfully!`, 'success');
+                } else {
+                    window.showAlertMessage(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Export error:', error);
+                window.showAlertMessage('Error exporting bot: ' + error.message, 'error');
+            }
+        }
+        
+        /**
+         * Delete current bot from Bot Builder page
+         */
+        window.deleteCurrentBot = async function(botName) {
+            // Show confirmation dialog
+            if (!confirm(`Are you sure you want to delete bot "${botName}"?\n\nThis action cannot be undone!`)) {
+                return;
+            }
+            
+            try {
+                // Encode bot name properly for URL
+                const encodedBotName = encodeURIComponent(botName);
+                
+                // Try DELETE method first, fallback to POST if needed
+                let response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // If DELETE fails, try POST
+                if (!response.ok && response.status === 405) {
+                    response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.showAlertMessage(`Bot "${botName}" deleted successfully!`, 'success');
+                    // Redirect to My Bots page after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/my-bots';
+                    }, 1000);
+                } else {
+                    window.showAlertMessage(`Error: ${data.error || 'Failed to delete bot'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                window.showAlertMessage('Error deleting bot: ' + error.message, 'error');
+            }
+        }
+        
+        /**
+         * Delete bot function with confirmation
+         */
+        window.deleteBot = async function(botName) {
+            // Show confirmation dialog
+            if (!confirm(`Are you sure you want to delete bot "${botName}"?\n\nThis action cannot be undone!`)) {
+                return;
+            }
+            
+            try {
+                // Encode bot name properly for URL
+                const encodedBotName = encodeURIComponent(botName);
+                
+                // Try DELETE method first, fallback to POST if needed
+                let response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                // If DELETE fails, try POST
+                if (!response.ok && response.status === 405) {
+                    response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.showAlertMessage(`Bot "${botName}" deleted successfully!`, 'success');
+                    // Reload the page after a short delay to refresh the bot list
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    window.showAlertMessage(`Error: ${data.error || 'Failed to delete bot'}`, 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                window.showAlertMessage('Error deleting bot: ' + error.message, 'error');
+            }
+        }
+        
+        /**
+         * Toggle select all checkboxes
+         */
+        window.toggleSelectAll = function(checkbox) {
+            const botCheckboxes = document.querySelectorAll('.bot-checkbox');
+            botCheckboxes.forEach(cb => {
+                cb.checked = checkbox.checked;
+            });
+            updateDeleteButton();
+        }
+        
+        /**
+         * Update delete selected button state
+         */
+        window.updateDeleteButton = function() {
+            const selectedCheckboxes = document.querySelectorAll('.bot-checkbox:checked');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (deleteBtn && selectedCount) {
+                const count = selectedCheckboxes.length;
+                selectedCount.textContent = count;
+                deleteBtn.disabled = count === 0;
+            }
+            
+            // Update select all checkbox state
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            const allCheckboxes = document.querySelectorAll('.bot-checkbox');
+            if (selectAllCheckbox && allCheckboxes.length > 0) {
+                selectAllCheckbox.checked = selectedCheckboxes.length === allCheckboxes.length;
+                selectAllCheckbox.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < allCheckboxes.length;
+            }
+        }
+        
+        /**
+         * Delete selected bots
+         */
+        window.deleteSelectedBots = async function() {
+            const selectedCheckboxes = document.querySelectorAll('.bot-checkbox:checked');
+            const selectedBots = Array.from(selectedCheckboxes).map(cb => cb.value);
+            
+            if (selectedBots.length === 0) {
+                window.showAlertMessage('Please select at least one bot to delete.', 'error');
+                return;
+            }
+            
+            // Show confirmation
+            const confirmMessage = `Are you sure you want to delete ${selectedBots.length} selected bot(s)?\n\nBots to delete:\n${selectedBots.join('\n')}\n\nThis action cannot be undone!`;
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Delete all selected bots
+            let successCount = 0;
+            let failCount = 0;
+            const errors = [];
+            
+            for (const botName of selectedBots) {
+                try {
+                    const encodedBotName = encodeURIComponent(botName);
+                    let response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok && response.status === 405) {
+                        response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                    }
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                        errors.push(`${botName}: ${data.error || 'Unknown error'}`);
+                    }
+                } catch (error) {
+                    console.error(`Error deleting bot ${botName}:`, error);
+                    failCount++;
+                    errors.push(`${botName}: ${error.message}`);
+                }
+            }
+            
+            // Show result
+            if (successCount > 0) {
+                let message = `Successfully deleted ${successCount} bot(s)`;
+                if (failCount > 0) {
+                    message += ` (${failCount} failed)`;
+                }
+                window.showAlertMessage(message, 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                window.showAlertMessage(`Failed to delete bots. Errors: ${errors.join('; ')}`, 'error');
+            }
+        }
+        
+        /**
+         * Delete all test bots (bots with "Test" in the name)
+         */
+        window.deleteAllTestBots = async function() {
+            // Get all bots from the table
+            const botRows = document.querySelectorAll('#myBotsTable tbody tr');
+            const testBots = [];
+            
+            botRows.forEach(row => {
+                const botNameCell = row.querySelector('td:nth-child(2) strong');
+                if (botNameCell) {
+                    const botName = botNameCell.textContent.trim();
+                    // Check if bot name contains "Test" (case insensitive)
+                    if (botName.toLowerCase().includes('test') || 
+                        botName.toLowerCase().includes('variable test') ||
+                        botName.toLowerCase().includes('flow test') ||
+                        botName.toLowerCase().includes('chat test') ||
+                        botName.toLowerCase().includes('api test')) {
+                        testBots.push(botName);
+                    }
+                }
+            });
+            
+            if (testBots.length === 0) {
+                window.showAlertMessage('No test bots found to delete.', 'info');
+                return;
+            }
+            
+            // Show confirmation
+            const confirmMessage = `Are you sure you want to delete ${testBots.length} test bot(s)?\n\nBots to delete:\n${testBots.join('\n')}\n\nThis action cannot be undone!`;
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+            
+            // Delete all test bots
+            let successCount = 0;
+            let failCount = 0;
+            
+            for (const botName of testBots) {
+                try {
+                    const encodedBotName = encodeURIComponent(botName);
+                    let response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok && response.status === 405) {
+                        response = await fetch(`/api/bot/delete/${encodedBotName}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                    }
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
+                } catch (error) {
+                    console.error(`Error deleting bot ${botName}:`, error);
+                    failCount++;
+                }
+            }
+            
+            // Show result
+            if (successCount > 0) {
+                window.showAlertMessage(`Successfully deleted ${successCount} test bot(s)${failCount > 0 ? ` (${failCount} failed)` : ''}!`, 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            } else {
+                window.showAlertMessage(`Failed to delete test bots.`, 'error');
+            }
+        }
+        
+        /**
+         * Import bot configuration
+         */
+        window.importBot = async function() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                window.showAlertMessage('Please select a JSON file to import', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    const botConfig = jsonData.bot_config || jsonData;
+                    
+                    const response = await fetch('/api/bot/import', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ bot_config: botConfig })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        window.showAlertMessage('Imported Successfully', 'success');
+                        fileInput.value = '';
+                        // Reload page after 1 second to show the new bot
+                        setTimeout(() => {
+                            window.location.href = '/my-bots';
+                        }, 1000);
+                    } else {
+                        window.showAlertMessage(`Error: ${data.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    window.showAlertMessage('Error importing bot: ' + error.message, 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        /**
+         * Show embed code modal with generated JavaScript snippet
+         */
+        window.showEmbedCode = function(botName) {
+            console.log('showEmbedCode called with botName:', botName);
+            
+            // Ensure botName is a string
+            if (!botName) {
+                alert('Error: Bot name is required');
+                return;
+            }
+            
+            try {
+                // Check if modal element exists
+                const modalElement = document.getElementById('embedCodeModal');
+                if (!modalElement) {
+                    console.error('Modal element not found');
+                    alert('Error: Modal element not found. Please refresh the page.');
+                    return;
+                }
+                
+                console.log('Modal element found');
+                
+                // Set bot name in modal
+                const botNameElement = document.getElementById('embedBotName');
+                if (botNameElement) {
+                    botNameElement.textContent = botName;
+                } else {
+                    console.warn('Bot name element not found');
+                }
+                
+                // Get current host (for the API endpoint)
+                const currentHost = window.location.origin;
+                const apiUrl = currentHost + '/chat';
+                
+                // Generate embed code
+                const embedCode = `<!-- AZone Chat Widget - ${botName} -->
+<script>
+(function() {
+    // Configuration
+    const BOT_NAME = '${botName}';
+    const API_URL = '${apiUrl}';
+    
+    // Create widget container
+    const widgetContainer = document.createElement('div');
+    widgetContainer.id = 'azone-chat-widget';
+    widgetContainer.style.cssText = \`
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        max-height: 80vh;
+        background: linear-gradient(135deg, #1A233A 0%, #0E121F 100%);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        display: none;
+        flex-direction: column;
+        z-index: 10000;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border: 1px solid #3B5D9A;
+    \`;
+    
+    // Create toggle button
+    const toggleButton = document.createElement('button');
+    toggleButton.id = 'azone-chat-toggle';
+    toggleButton.style.cssText = \`
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: linear-gradient(90deg, #63C7FF 0%, #3B5D9A 100%);
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 10001;
+        transition: transform 0.2s;
+    \`;
+    toggleButton.innerHTML = '<i class="fas fa-comments"></i>';
+    toggleButton.onclick = function() {
+        const isVisible = widgetContainer.style.display !== 'none';
+        widgetContainer.style.display = isVisible ? 'none' : 'flex';
+        toggleButton.style.display = isVisible ? 'block' : 'none';
+    };
+    
+    // Widget header
+    const header = document.createElement('div');
+    header.style.cssText = \`
+        background: linear-gradient(180deg, #1A233A 0%, #0E121F 100%);
+        padding: 15px;
+        border-radius: 15px 15px 0 0;
+        border-bottom: 1px solid #3B5D9A;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    \`;
+    header.innerHTML = \`
+        <h6 style="margin: 0; color: #63C7FF;">
+            <i class="fas fa-robot"></i> \${BOT_NAME}
+        </h6>
+        <button onclick="document.getElementById('azone-chat-widget').style.display='none'; document.getElementById('azone-chat-toggle').style.display='block';" 
+                style="background: none; border: none; color: #F0F4F8; cursor: pointer; font-size: 20px;">
+            <i class="fas fa-times"></i>
+        </button>
+    \`;
+    
+    // Chat messages area
+    const messagesArea = document.createElement('div');
+    messagesArea.id = 'azone-messages';
+    messagesArea.style.cssText = \`
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: #0E121F;
+    \`;
+    
+    // Input area
+    const inputArea = document.createElement('div');
+    inputArea.style.cssText = \`
+        padding: 15px;
+        border-top: 1px solid #3B5D9A;
+        background-color: #1A233A;
+        border-radius: 0 0 15px 15px;
+    \`;
+    const inputWrapper = document.createElement('div');
+    inputWrapper.style.cssText = 'display: flex; gap: 10px;';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Type a message...';
+    input.id = 'azone-chat-input';
+    input.style.cssText = \`
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #3B5D9A;
+        border-radius: 20px;
+        background-color: #0E121F;
+        color: #F0F4F8;
+        outline: none;
+    \`;
+    const sendButton = document.createElement('button');
+    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+    sendButton.style.cssText = \`
+        padding: 10px 20px;
+        border: none;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #63C7FF 0%, #3B5D9A 100%);
+        color: white;
+        cursor: pointer;
+    \`;
+    
+    // Session data
+    let sessionData = {};
+    let sessionId = null;
+    
+    // Add message to chat
+    function addMessage(text, isBot = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = \`
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+            \${isBot ? 'background-color: #1A233A; color: #F0F4F8; margin-right: auto;' : 'background: linear-gradient(90deg, #63C7FF 0%, #3B5D9A 100%); color: white; margin-left: auto; text-align: right;'}
+        \`;
+        messageDiv.textContent = text;
+        messagesArea.appendChild(messageDiv);
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    }
+    
+    // Send message
+    async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+        
+        addMessage(message, false);
+        input.value = '';
+        input.disabled = true;
+        sendButton.disabled = true;
+        sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        try {
+            if (!sessionId) {
+                sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bot_name: BOT_NAME,
+                    user_message: message,
+                    session_data: sessionData,
+                    session_id: sessionId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                addMessage(data.bot_response, true);
+                sessionData = data.session_data || {};
+                sessionId = data.session_id || sessionId;
+            } else {
+                addMessage('Error: ' + (data.error || 'Failed to get response'), true);
+            }
+        } catch (error) {
+            addMessage('Error: ' + error.message, true);
+        } finally {
+            input.disabled = false;
+            sendButton.disabled = false;
+            sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        }
+    }
+    
+    sendButton.onclick = sendMessage;
+    input.onkeypress = function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    };
+    
+    inputWrapper.appendChild(input);
+    inputWrapper.appendChild(sendButton);
+    inputArea.appendChild(inputWrapper);
+    
+    widgetContainer.appendChild(header);
+    widgetContainer.appendChild(messagesArea);
+    widgetContainer.appendChild(inputArea);
+    
+    document.body.appendChild(widgetContainer);
+    document.body.appendChild(toggleButton);
+    
+    // Load Font Awesome if not already loaded
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(link);
+    }
+    
+    // Show initial greeting
+    setTimeout(() => {
+        addMessage('Hello! I\\'m ' + BOT_NAME + '. How can I help you today?', true);
+    }, 500);
+})();
+<\/script>`;
+            
+                // Set embed code in textarea
+                const embedCodeText = document.getElementById('embedCodeText');
+                if (embedCodeText) {
+                    embedCodeText.value = embedCode;
+                }
+                
+                // Hide copy success message
+                const copySuccessMsg = document.getElementById('copySuccessMessage');
+                if (copySuccessMsg) {
+                    copySuccessMsg.style.display = 'none';
+                }
+                
+                // Show modal using Bootstrap or fallback
+                console.log('Bootstrap available:', typeof bootstrap !== 'undefined');
+                
+                // Function to show modal
+                function showModal() {
+                    modalElement.style.display = 'block';
+                    modalElement.classList.add('show');
+                    modalElement.setAttribute('aria-hidden', 'false');
+                    modalElement.style.zIndex = '1055';
+                    document.body.classList.add('modal-open');
+                    
+                    // Create or update backdrop
+                    let backdrop = document.getElementById('embedModalBackdrop');
+                    if (!backdrop) {
+                        backdrop = document.createElement('div');
+                        backdrop.className = 'modal-backdrop fade show';
+                        backdrop.id = 'embedModalBackdrop';
+                        backdrop.style.zIndex = '1050';
+                        document.body.appendChild(backdrop);
+                    }
+                    
+                    // Close button handlers
+                    const closeButtons = modalElement.querySelectorAll('[data-bs-dismiss="modal"], .btn-close, button[data-bs-dismiss]');
+                    closeButtons.forEach(btn => {
+                        btn.onclick = function() {
+                            hideModal();
+                        };
+                    });
+                    
+                    // Close on backdrop click
+                    backdrop.onclick = function() {
+                        hideModal();
+                    };
+                }
+                
+                // Function to hide modal
+                function hideModal() {
+                    modalElement.style.display = 'none';
+                    modalElement.classList.remove('show');
+                    modalElement.setAttribute('aria-hidden', 'true');
+                    document.body.classList.remove('modal-open');
+                    
+                    const backdrop = document.getElementById('embedModalBackdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+                }
+                
+                // Try Bootstrap first, then fallback
+                if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                    console.log('Using Bootstrap Modal');
+                    try {
+                        const modal = new bootstrap.Modal(modalElement, {
+                            backdrop: true,
+                            keyboard: true
+                        });
+                        modal.show();
+                    } catch (e) {
+                        console.error('Bootstrap Modal error:', e);
+                        showModal();
+                    }
+                } else {
+                    console.log('Using fallback modal display');
+                    showModal();
+                }
+            } catch (error) {
+                console.error('Error showing embed code modal:', error);
+                alert('Error: ' + error.message + '\n\nPlease check the browser console for details.');
+            }
+        }
+        
+        /**
+         * Copy embed code to clipboard
+         */
+        window.copyEmbedCode = function() {
+            const embedCodeText = document.getElementById('embedCodeText');
+            embedCodeText.select();
+            embedCodeText.setSelectionRange(0, 99999); // For mobile devices
+            
+            try {
+                document.execCommand('copy');
+                // Show success message
+                const successMsg = document.getElementById('copySuccessMessage');
+                successMsg.style.display = 'block';
+                setTimeout(() => {
+                    successMsg.style.display = 'none';
+                }, 3000);
+            } catch (err) {
+                // Fallback for modern browsers
+                navigator.clipboard.writeText(embedCodeText.value).then(() => {
+                    const successMsg = document.getElementById('copySuccessMessage');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 3000);
+                }).catch(() => {
+                    alert('Failed to copy. Please select and copy manually.');
+                });
+            }
+        }
+        
+        // Chat widget functions are defined at the top of the script to avoid reference errors
+        
+        /**
+         * Handle Enter key press in chat input
+         */
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+        
+        /**
+         * Send chat message to API
+         */
+        async function sendChatMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            const chatWidgetBody = document.getElementById('chatWidgetBody');
+            const chatEmptyState = document.getElementById('chatEmptyState');
+            const userMessage = chatInput.value.trim();
+            
+            if (!userMessage) {
+                return;
+            }
+            
+            // Get bot name from form
+            const botNameInput = document.getElementById('botName');
+            chatBotName = botNameInput ? botNameInput.value.trim() : '';
+            
+            if (!chatBotName) {
+                alert('Please enter a bot name in the form above first!');
+                chatInput.focus();
+                return;
+            }
+            
+            // Disable input and button
+            chatInput.disabled = true;
+            chatSendBtn.disabled = true;
+            chatSendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            // Hide empty state
+            if (chatEmptyState) {
+                chatEmptyState.style.display = 'none';
+            }
+            
+            // Add user message to chat
+            addChatMessage(userMessage, 'user');
+            
+            // Clear input
+            chatInput.value = '';
+            
+            try {
+                // Initialize session ID if not exists
+                if (!chatSessionId) {
+                    chatSessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                }
+                
+                // Prepare request data
+                const requestData = {
+                    bot_name: chatBotName,
+                    user_message: userMessage,
+                    session_data: chatSessionData,
+                    session_id: chatSessionId
+                };
+                
+                // Send POST request to /chat endpoint
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update session data and session ID
+                    chatSessionData = data.session_data || {};
+                    if (data.session_id) {
+                        chatSessionId = data.session_id;
+                    }
+                    
+                    // Add bot response to chat
+                    addChatMessage(data.bot_response, 'bot');
+                } else {
+                    // Show error message
+                    addChatMessage('Error: ' + (data.error || 'Unknown error occurred'), 'bot');
+                }
+                
+            } catch (error) {
+                console.error('Chat error:', error);
+                addChatMessage('Error: Failed to connect to chat API. Please try again.', 'bot');
+            } finally {
+                // Re-enable input and button
+                chatInput.disabled = false;
+                chatSendBtn.disabled = false;
+                chatSendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                chatInput.focus();
+                
+                // Scroll to bottom
+                scrollChatToBottom();
+            }
+        }
+        
+        /**
+         * Add message to chat history
+         */
+        function addChatMessage(message, type) {
+            const chatWidgetBody = document.getElementById('chatWidgetBody');
+            const chatEmptyState = document.getElementById('chatEmptyState');
+            
+            // Hide empty state if exists
+            if (chatEmptyState) {
+                chatEmptyState.style.display = 'none';
+            }
+            
+            // Create message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${type}`;
+            
+            const time = new Date().toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="chat-message-bubble">${escapeHtml(message)}</div>
+                <div class="chat-message-time">${time}</div>
+            `;
+            
+            chatWidgetBody.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            scrollChatToBottom();
+        }
+        
+        /**
+         * Scroll chat to bottom
+         */
+        function scrollChatToBottom() {
+            const chatWidgetBody = document.getElementById('chatWidgetBody');
+            if (chatWidgetBody) {
+                chatWidgetBody.scrollTop = chatWidgetBody.scrollHeight;
+            }
+        }
+        
+        /**
+         * Escape HTML to prevent XSS
+         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ========== Visual Flow Builder JavaScript ==========
+        
+        let flowNodes = [];
+        let flowConnections = [];
+        let selectedNode = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let flowNodeCounter = 0;
+        
+        /**
+         * Switch to Form View
+         */
+        function switchToFormView() {
+            document.getElementById('formViewContainer').style.display = 'block';
+            document.getElementById('flowViewContainer').style.display = 'none';
+            document.getElementById('formViewBtn').classList.add('active');
+            document.getElementById('flowViewBtn').classList.remove('active');
+        }
+        
+        /**
+         * Switch to Flow View
+         */
+        function switchToFlowView() {
+            document.getElementById('formViewContainer').style.display = 'none';
+            document.getElementById('flowViewContainer').style.display = 'block';
+            document.getElementById('formViewBtn').classList.remove('active');
+            document.getElementById('flowViewBtn').classList.add('active');
+            
+            // Sync form steps to flow if flow is empty
+            if (flowNodes.length === 0) {
+                syncFormToFlow();
+            }
+            
+            // Draw connections
+            drawFlowConnections();
+        }
+        
+        /**
+         * Add a new flow node
+         */
+        function addFlowNode(nodeType = 'message') {
+            flowNodeCounter++;
+            const nodeId = 'flow-node-' + flowNodeCounter;
+            
+            const node = {
+                id: nodeId,
+                type: nodeType,
+                content: '',
+                x: 200 + (flowNodes.length * 250),
+                y: 150 + (Math.floor(flowNodes.length / 3) * 200)
+            };
+            
+            flowNodes.push(node);
+            renderFlowNode(node);
+            drawFlowConnections();
+        }
+        
+        /**
+         * Render a flow node
+         */
+        function renderFlowNode(node) {
+            const container = document.getElementById('flowNodesContainer');
+            const nodeElement = document.createElement('div');
+            nodeElement.className = `flow-node flow-node-${node.type}`;
+            nodeElement.id = node.id;
+            nodeElement.style.left = node.x + 'px';
+            nodeElement.style.top = node.y + 'px';
+            
+            // Set icon and label based on node type
+            let icon, label;
+            switch(node.type) {
+                case 'start':
+                    icon = 'fa-play';
+                    label = 'Start';
+                    break;
+                case 'message':
+                    icon = 'fa-comment';
+                    label = 'Message';
+                    break;
+                case 'question':
+                    icon = 'fa-question-circle';
+                    label = 'Question';
+                    break;
+                case 'api_call':
+                    icon = 'fa-plug';
+                    label = 'API Call';
+                    break;
+                case 'webhook':
+                    icon = 'fa-link';
+                    label = 'Webhook';
+                    break;
+                default:
+                    icon = 'fa-circle';
+                    label = 'Node';
+            }
+            
+            nodeElement.innerHTML = `
+                <div class="flow-node-actions">
+                    <button class="flow-node-action-btn flow-node-edit-btn" onclick="editFlowNode('${node.id}')" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="flow-node-action-btn" onclick="deleteFlowNode('${node.id}')" title="Delete">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="flow-node-content" onclick="selectFlowNode('${node.id}')">
+                    <i class="fas ${icon}"></i>
+                    <div class="flow-node-label">${label}</div>
+                    ${node.content ? `<div style="font-size: 0.75rem; margin-top: 5px; opacity: 0.9;">${node.content.substring(0, 20)}${node.content.length > 20 ? '...' : ''}</div>` : ''}
+                </div>
+                <div class="flow-node-connector input"></div>
+                <div class="flow-node-connector output"></div>
+            `;
+            
+            // Make node draggable
+            makeNodeDraggable(nodeElement, node);
+            
+            container.appendChild(nodeElement);
+        }
+        
+        /**
+         * Make node draggable
+         */
+        function makeNodeDraggable(element, node) {
+            element.addEventListener('mousedown', function(e) {
+                if (e.target.closest('.flow-node-action-btn')) return;
+                
+                isDragging = true;
+                selectedNode = node;
+                element.classList.add('selected');
+                
+                const rect = element.getBoundingClientRect();
+                const canvasRect = document.getElementById('flowCanvas').getBoundingClientRect();
+                dragOffset.x = e.clientX - rect.left;
+                dragOffset.y = e.clientY - rect.top;
+                
+                e.preventDefault();
+            });
+        }
+        
+        /**
+         * Handle mouse move for dragging
+         */
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging && selectedNode) {
+                const canvas = document.getElementById('flowCanvas');
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                const x = e.clientX - canvasRect.left - dragOffset.x;
+                const y = e.clientY - canvasRect.top - dragOffset.y;
+                
+                selectedNode.x = Math.max(0, Math.min(x, canvas.offsetWidth - 150));
+                selectedNode.y = Math.max(0, Math.min(y, canvas.offsetHeight - 100));
+                
+                const nodeElement = document.getElementById(selectedNode.id);
+                if (nodeElement) {
+                    nodeElement.style.left = selectedNode.x + 'px';
+                    nodeElement.style.top = selectedNode.y + 'px';
+                }
+                
+                drawFlowConnections();
+            }
+        });
+        
+        document.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                if (selectedNode) {
+                    const nodeElement = document.getElementById(selectedNode.id);
+                    if (nodeElement) {
+                        nodeElement.classList.remove('selected');
+                    }
+                }
+                selectedNode = null;
+            }
+        });
+        
+        /**
+         * Select flow node
+         */
+        function selectFlowNode(nodeId) {
+            // Remove previous selection
+            document.querySelectorAll('.flow-node').forEach(n => n.classList.remove('selected'));
+            
+            // Select new node
+            const nodeElement = document.getElementById(nodeId);
+            if (nodeElement) {
+                nodeElement.classList.add('selected');
+                selectedNode = flowNodes.find(n => n.id === nodeId);
+            }
+        }
+        
+        /**
+         * Edit flow node
+         */
+        function editFlowNode(nodeId) {
+            const node = flowNodes.find(n => n.id === nodeId);
+            if (!node) return;
+            
+            const newType = prompt('Enter step type (message/question):', node.type);
+            if (newType && ['message', 'question'].includes(newType.toLowerCase())) {
+                node.type = newType.toLowerCase();
+            }
+            
+            const newContent = prompt('Enter step content:', node.content);
+            if (newContent !== null) {
+                node.content = newContent;
+            }
+            
+            // Re-render node
+            const nodeElement = document.getElementById(nodeId);
+            if (nodeElement) {
+                nodeElement.remove();
+            }
+            renderFlowNode(node);
+            drawFlowConnections();
+        }
+        
+        /**
+         * Delete flow node
+         */
+        function deleteFlowNode(nodeId) {
+            if (confirm('Are you sure you want to delete this step?')) {
+                flowNodes = flowNodes.filter(n => n.id !== nodeId);
+                const nodeElement = document.getElementById(nodeId);
+                if (nodeElement) {
+                    nodeElement.remove();
+                }
+                drawFlowConnections();
+            }
+        }
+        
+        /**
+         * Draw connections between nodes
+         */
+        function drawFlowConnections() {
+            const svg = document.getElementById('flowConnections');
+            svg.innerHTML = '<defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><polygon points="0 0, 10 3, 0 6" fill="rgba(102, 126, 234, 0.6)" /></marker></defs>';
+            
+            // Draw line from start to first node
+            const startNode = document.getElementById('flow-node-start');
+            if (startNode && flowNodes.length > 0) {
+                const startRect = startNode.getBoundingClientRect();
+                const canvasRect = document.getElementById('flowCanvas').getBoundingClientRect();
+                const firstNode = flowNodes[0];
+                const firstNodeElement = document.getElementById(firstNode.id);
+                
+                if (firstNodeElement) {
+                    const firstRect = firstNodeElement.getBoundingClientRect();
+                    const x1 = startRect.left - canvasRect.left + startRect.width / 2;
+                    const y1 = startRect.bottom - canvasRect.top;
+                    const x2 = firstRect.left - canvasRect.left + firstRect.width / 2;
+                    const y2 = firstRect.top - canvasRect.top;
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('class', 'flow-connection-line');
+                    svg.appendChild(line);
+                }
+            }
+            
+            // Draw lines between flow nodes
+            for (let i = 0; i < flowNodes.length - 1; i++) {
+                const node1 = flowNodes[i];
+                const node2 = flowNodes[i + 1];
+                const node1Element = document.getElementById(node1.id);
+                const node2Element = document.getElementById(node2.id);
+                
+                if (node1Element && node2Element) {
+                    const canvasRect = document.getElementById('flowCanvas').getBoundingClientRect();
+                    const rect1 = node1Element.getBoundingClientRect();
+                    const rect2 = node2Element.getBoundingClientRect();
+                    
+                    const x1 = rect1.left - canvasRect.left + rect1.width / 2;
+                    const y1 = rect1.bottom - canvasRect.top;
+                    const x2 = rect2.left - canvasRect.left + rect2.width / 2;
+                    const y2 = rect2.top - canvasRect.top;
+                    
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', x1);
+                    line.setAttribute('y1', y1);
+                    line.setAttribute('x2', x2);
+                    line.setAttribute('y2', y2);
+                    line.setAttribute('class', 'flow-connection-line');
+                    svg.appendChild(line);
+                }
+            }
+        }
+        
+        /**
+         * Auto layout flow nodes
+         */
+        function autoLayoutFlow() {
+            const canvas = document.getElementById('flowCanvas');
+            const width = canvas.offsetWidth;
+            const centerX = width / 2;
+            
+            flowNodes.forEach((node, index) => {
+                node.x = centerX - 75;
+                node.y = 150 + (index * 150);
+                
+                const nodeElement = document.getElementById(node.id);
+                if (nodeElement) {
+                    nodeElement.style.left = node.x + 'px';
+                    nodeElement.style.top = node.y + 'px';
+                }
+            });
+            
+            drawFlowConnections();
+        }
+        
+        /**
+         * Sync flow to form view
+         */
+        function syncFlowToForm() {
+            // Clear existing steps
+            document.getElementById('stepsContainer').innerHTML = '';
+            stepCount = 0;
+            
+            // Add steps from flow
+            flowNodes.forEach((node, index) => {
+                stepCount++;
+                const stepId = 'step-' + stepCount;
+                const stepsContainer = document.getElementById('stepsContainer');
+                
+                const stepCard = document.createElement('div');
+                stepCard.className = 'card mb-3 step-card';
+                stepCard.id = stepId;
+                
+                const typeSelectId = 'stepType-' + stepCount;
+                const contentInputId = 'stepContent-' + stepCount;
+                
+                stepCard.innerHTML = `
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list-ol text-primary"></i> Step ${stepCount}
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-step" onclick="removeStep('${stepId}')">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i> Step Type
+                            </label>
+                            <select class="form-select step-type-select" id="${typeSelectId}" name="stepType[]" onchange="updateContentInput('${stepId}', '${typeSelectId}', '${contentInputId}')" required>
+                                <option value="">-- Select Type --</option>
+                                <option value="message" ${node.type === 'message' ? 'selected' : ''}>Message</option>
+                                <option value="question" ${node.type === 'question' ? 'selected' : ''}>Question</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="${contentInputId}">
+                                <i class="fas fa-comment"></i> Content
+                            </label>
+                            <textarea class="form-control step-content-input" id="${contentInputId}" name="stepContent[]" rows="3" required>${node.content || ''}</textarea>
+                        </div>
+                    </div>
+                `;
+                
+                stepsContainer.appendChild(stepCard);
+            });
+            
+            window.showAlertMessage('Flow synced to form view!', 'success');
+            switchToFormView();
+        }
+        
+        /**
+         * Sync form to flow view
+         */
+        function syncFormToFlow() {
+            flowNodes = [];
+            flowNodeCounter = 0;
+            
+            const stepCards = document.querySelectorAll('.step-card');
+            stepCards.forEach((card) => {
+                const typeSelect = card.querySelector('.step-type-select');
+                const contentInput = card.querySelector('.step-content-input');
+                
+                if (typeSelect && contentInput && typeSelect.value) {
+                    flowNodeCounter++;
+                    const nodeId = 'flow-node-' + flowNodeCounter;
+                    
+                    const node = {
+                        id: nodeId,
+                        type: typeSelect.value,
+                        content: contentInput.value.trim(),
+                        x: 200 + (flowNodes.length * 250),
+                        y: 150 + (Math.floor(flowNodes.length / 3) * 200)
+                    };
+                    
+                    flowNodes.push(node);
+                    renderFlowNode(node);
+                }
+            });
+            
+            drawFlowConnections();
+        }
+        
+        /**
+         * Load and display bot templates
+         */
+        window.loadTemplates = async function() {
+            const templateCards = document.getElementById('templateCards');
+            if (!templateCards) return;
+            
+            try {
+                const response = await fetch('/api/templates');
+                const data = await response.json();
+                
+                if (data.success && data.templates) {
+                    templateCards.innerHTML = '';
+                    
+                    data.templates.forEach(template => {
+                        const col = document.createElement('div');
+                        col.className = 'col-md-6 col-lg-4 mb-3';
+                        col.innerHTML = `
+                            <div class="card bg-dark border-secondary h-100">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">${escapeHtml(template.name)}</h6>
+                                    <p class="card-text text-muted small">${escapeHtml(template.description)}</p>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="useTemplate('${template.id}')">
+                                        <i class="fas fa-plus"></i> Use Template
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        templateCards.appendChild(col);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading templates:', error);
+            }
+        }
+        
+        /**
+         * Use a template to create a bot
+         */
+        window.useTemplate = async function(templateId) {
+            const botName = prompt('Enter a name for your bot:');
+            if (!botName || !botName.trim()) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/templates/${templateId}/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ bot_name: botName.trim() })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.showAlertMessage(`Bot "${data.bot_name}" created from template successfully!`, 'success');
+                    // Redirect to edit the newly created bot
+                    setTimeout(() => {
+                        window.location.href = `/bot-builder?bot_name=${encodeURIComponent(data.bot_name)}`;
+                    }, 1500);
+                } else {
+                    window.showAlertMessage(`Error: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error creating bot from template:', error);
+                window.showAlertMessage('Error creating bot from template: ' + error.message, 'error');
+            }
+        }
+        
+        // ========== Bot Versioning Functions ==========
+        
+        /**
+         * Shared function to collect all step data from form
+         */
+        function collectAllSteps() {
+            const steps = [];
+            const stepCards = document.querySelectorAll('.step-card');
+            
+            stepCards.forEach((card) => {
+                const stepId = card.id;
+                const stepNumber = stepId.replace('step-', '');
+                const typeSelect = card.querySelector('.step-type-select');
+                const contentInput = card.querySelector('.step-content-input');
+                const triggersInput = document.getElementById(`stepTriggers-${stepNumber}`);
+                const variableInput = document.getElementById(`stepVariable-${stepNumber}`);
+                const conditionSelect = document.getElementById(`stepCondition-${stepNumber}`);
+                const conditionValue = document.getElementById(`stepConditionValue-${stepNumber}`);
+                
+                // API configuration fields
+                const apiUrlInput = document.getElementById(`apiUrl-${stepNumber}`);
+                const apiMethodSelect = document.getElementById(`apiMethod-${stepNumber}`);
+                const apiHeadersInput = document.getElementById(`apiHeaders-${stepNumber}`);
+                const apiBodyInput = document.getElementById(`apiBody-${stepNumber}`);
+                const apiResponseTemplateInput = document.getElementById(`apiResponseTemplate-${stepNumber}`);
+                
+                const stepType = typeSelect ? typeSelect.value : '';
+                
+                // Validate based on step type
+                let isValid = false;
+                if (stepType === 'api_call' || stepType === 'webhook') {
+                    isValid = apiUrlInput && apiUrlInput.value.trim();
+                } else {
+                    isValid = contentInput && contentInput.value.trim();
+                }
+                
+                if (typeSelect && stepType && isValid) {
+                    const stepData = { type: stepType };
+                    
+                    // Add content for message/question types
+                    if (stepType === 'message' || stepType === 'question') {
+                        stepData.content = contentInput.value.trim();
+                    }
+                    
+                    // Add API configuration for API call type
+                    if (stepType === 'api_call') {
+                        stepData.api_config = {
+                            url: apiUrlInput ? apiUrlInput.value.trim() : '',
+                            method: apiMethodSelect ? apiMethodSelect.value : 'POST',
+                            headers: apiHeadersInput ? apiHeadersInput.value.trim() : '{}',
+                            body: apiBodyInput ? apiBodyInput.value.trim() : '{}',
+                            response_template: apiResponseTemplateInput ? apiResponseTemplateInput.value.trim() : 'API call completed successfully.'
+                        };
+                    }
+                    
+                    // Add webhook configuration for webhook type
+                    if (stepType === 'webhook') {
+                        stepData.webhook_config = {
+                            url: apiUrlInput ? apiUrlInput.value.trim() : '',
+                            method: apiMethodSelect ? apiMethodSelect.value : 'POST',
+                            headers: apiHeadersInput ? apiHeadersInput.value.trim() : '{}',
+                            body: apiBodyInput ? apiBodyInput.value.trim() : '{}',
+                            response_template: apiResponseTemplateInput ? apiResponseTemplateInput.value.trim() : 'Webhook triggered successfully.'
+                        };
+                    }
+                    
+                    // Add triggers if provided
+                    if (triggersInput && triggersInput.value.trim()) {
+                        const triggers = triggersInput.value.split(',').map(t => t.trim()).filter(t => t);
+                        if (triggers.length > 0) {
+                            stepData.triggers = triggers;
+                        }
+                    }
+                    
+                    // Add variable if provided (for questions)
+                    if (variableInput && variableInput.value.trim()) {
+                        stepData.variables = { [variableInput.value.trim()]: '{answer}' };
+                        stepData.actions = [{
+                            type: 'save_answer',
+                            variable: variableInput.value.trim()
+                        }];
+                    }
+                    
+                    // Add condition if provided
+                    if (conditionSelect && conditionSelect.value) {
+                        const conditionType = conditionSelect.value;
+                        if (conditionValue && conditionValue.value.trim()) {
+                            if (conditionType === 'variable_equals') {
+                                const parts = conditionValue.value.split('=');
+                                if (parts.length === 2) {
+                                    stepData.condition = {
+                                        type: conditionType,
+                                        variable: parts[0].trim(),
+                                        value: parts[1].trim()
+                                    };
+                                }
+                            } else if (conditionType === 'step_completed') {
+                                const stepIndex = parseInt(conditionValue.value);
+                                if (!isNaN(stepIndex)) {
+                                    stepData.condition = {
+                                        type: conditionType,
+                                        step_index: stepIndex
+                                    };
+                                }
+                            } else if (conditionType === 'contains_keyword') {
+                                const keywords = conditionValue.value.split(',').map(k => k.trim()).filter(k => k);
+                                if (keywords.length > 0) {
+                                    stepData.condition = {
+                                        type: conditionType,
+                                        keywords: keywords
+                                    };
+                                }
+                            }
+                        } else {
+                            stepData.condition = { type: 'always' };
+                        }
+                    }
+                    
+                    steps.push(stepData);
+                }
+            });
+            
+            return steps;
+        }
+        
+        /**
+         * Save and publish bot
+         */
+        window.saveAndPublish = function() {
+            const botName = document.getElementById('botName')?.value.trim() || '';
+            const initialGreeting = document.getElementById('initialGreeting')?.value.trim() || '';
+            
+            if (!botName || !initialGreeting) {
+                alert('Please fill in bot name and initial greeting first');
+                return;
+            }
+            
+            // Collect all steps using shared function
+            const steps = collectAllSteps();
+            
+            const requestData = {
+                botName: botName,
+                initialGreeting: initialGreeting,
+                stepsJson: JSON.stringify(steps),
+                publish: true
+            };
+            
+            // Show loading state
+            const saveBtn = document.querySelector('button[onclick*="saveAndPublish"]');
+            const originalBtnText = saveBtn ? saveBtn.innerHTML : '';
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
+            }
+            
+            fetch('{{ url_for("save_bot") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalBtnText;
+                }
+                
+                if (data.success) {
+                    window.showAlertMessage(data.message || 'Bot saved and published successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    window.showAlertMessage(data.error || 'Failed to publish bot', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = originalBtnText;
+                }
+                window.showAlertMessage('Error publishing bot: ' + error.message, 'error');
+            });
+        };
+        
+        /**
+         * Publish draft version
+         */
+        window.publishDraft = async function(botName) {
+            if (!confirm(`Publish draft version of "${botName}"? This will make it live.`)) {
+                return;
+            }
+            
+            try {
+                const encodedBotName = encodeURIComponent(botName);
+                const response = await fetch(`/api/bot/${encodedBotName}/publish`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    window.showAlertMessage(data.message || 'Draft published successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    window.showAlertMessage(data.error || 'Failed to publish draft', 'error');
+                }
+            } catch (error) {
+                console.error('Error publishing draft:', error);
+                window.showAlertMessage('Error publishing draft: ' + error.message, 'error');
+            }
+        };
+        
+        /**
+         * Test draft version
+         */
+        window.testDraft = function(botName) {
+            const testWindow = window.open('', 'testDraft', 'width=600,height=700');
+            if (!testWindow) {
+                alert('Please allow popups to test the draft');
+                return;
+            }
+            
+            testWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Test Draft: ${botName}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; background: #1A233A; color: #F0F4F8; }
+                        .chat-container { max-width: 500px; margin: 0 auto; }
+                        .chat-messages { height: 400px; overflow-y: auto; border: 1px solid #3B5D9A; padding: 15px; margin-bottom: 15px; background: #0E121F; border-radius: 10px; }
+                        .message { margin-bottom: 15px; padding: 10px; border-radius: 8px; }
+                        .user { background: #3B5D9A; text-align: right; }
+                        .bot { background: #667eea; }
+                        .input-group { display: flex; gap: 10px; }
+                        input { flex: 1; padding: 10px; border: 1px solid #3B5D9A; background: #0E121F; color: #F0F4F8; border-radius: 5px; }
+                        button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+                        button:hover { background: #5568d3; }
+                    </style>
+                </head>
+                <body>
+                    <div class="chat-container">
+                        <h2>Testing Draft: ${botName}</h2>
+                        <div class="chat-messages" id="messages"></div>
+                        <div class="input-group">
+                            <input type="text" id="userInput" placeholder="Type your message...">
+                            <button onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
+                    <script>
+                        let sessionData = {};
+                        let sessionId = 'test_' + Date.now();
+                        
+                        function addMessage(text, type) {
+                            const messages = document.getElementById('messages');
+                            const div = document.createElement('div');
+                            div.className = 'message ' + type;
+                            div.textContent = text;
+                            messages.appendChild(div);
+                            messages.scrollTop = messages.scrollHeight;
+                        }
+                        
+                        async function sendMessage() {
+                            const input = document.getElementById('userInput');
+                            const message = input.value.trim();
+                            if (!message) return;
+                            
+                            addMessage(message, 'user');
+                            input.value = '';
+                            
+                            try {
+                                const response = await fetch('/api/bot/${encodeURIComponent(botName)}/test-draft', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        user_message: message,
+                                        session_data: sessionData,
+                                        session_id: sessionId
+                                    })
+                                });
+                                
+                                const data = await response.json();
+                                if (data.success) {
+                                    sessionData = data.session_data || {};
+                                    addMessage(data.bot_response, 'bot');
+                                } else {
+                                    addMessage('Error: ' + (data.error || 'Unknown error'), 'bot');
+                                }
+                            } catch (error) {
+                                addMessage('Error: ' + error.message, 'bot');
+                            }
+                        }
+                        
+                        document.getElementById('userInput').addEventListener('keypress', function(e) {
+                            if (e.key === 'Enter') sendMessage();
+                        });
+                    </script>
+                </body>
+                </html>
+            `);
+        };
+        
+        /**
+         * Show version history
+         */
+        window.showVersionHistory = async function(botName) {
+            try {
+                const encodedBotName = encodeURIComponent(botName);
+                const response = await fetch(`/api/bot/${encodedBotName}/versions`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    window.showAlertMessage(data.error || 'Failed to load version history', 'error');
+                    return;
+                }
+                
+                const versions = data.versions || [];
+                const liveVersion = data.live_version;
+                const draftVersion = data.draft_version;
+                
+                let html = '<div class="version-history"><h5>Version History: ' + botName + '</h5>';
+                html += '<table class="table table-dark"><thead><tr><th>Version</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead><tbody>';
+                
+                versions.forEach(v => {
+                    const isLive = v.version_number === liveVersion;
+                    const isDraft = v.version_number === draftVersion;
+                    html += '<tr>';
+                    html += '<td>v' + v.version_number + '</td>';
+                    html += '<td>';
+                    if (isLive) html += '<span class="badge bg-success">Live</span> ';
+                    if (isDraft) html += '<span class="badge bg-warning">Draft</span>';
+                    if (!isLive && !isDraft) html += '<span class="badge bg-secondary">Archived</span>';
+                    html += '</td>';
+                    html += '<td>' + (v.updated_at || v.created_at || 'N/A') + '</td>';
+                    html += '<td>';
+                    if (!isLive && (window.canEditBots || false)) {
+                        html += '<button class="btn btn-sm btn-primary" onclick="window.switchToVersion(\'' + botName.replace(/'/g, "\\'") + '\', ' + v.version_number + ')">Switch to This</button>';
+                    }
+                    html += '</td>';
+                    html += '</tr>';
+                });
+                
+                html += '</tbody></table></div>';
+                
+                const modal = document.createElement('div');
+                modal.className = 'modal fade show';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content" style="background-color: #1A233A; color: #F0F4F8;">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Version History</h5>
+                                <button type="button" class="btn-close btn-close-white" onclick="this.closest('.modal').remove()"></button>
+                            </div>
+                            <div class="modal-body">${html}</div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+            } catch (error) {
+                console.error('Error loading version history:', error);
+                window.showAlertMessage('Error loading version history: ' + error.message, 'error');
+            }
+        };
+        
+        /**
+         * Switch to a specific version
+         */
+        window.switchToVersion = async function(botName, versionNumber) {
+            if (!confirm(`Switch to version ${versionNumber}? This will make it the live version.`)) {
+                return;
+            }
+            
+            try {
+                const encodedBotName = encodeURIComponent(botName);
+                const response = await fetch(`/api/bot/${encodedBotName}/switch-version/${versionNumber}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    window.showAlertMessage(data.message || 'Version switched successfully!', 'success');
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    window.showAlertMessage(data.error || 'Failed to switch version', 'error');
+                }
+            } catch (error) {
+                console.error('Error switching version:', error);
+                window.showAlertMessage('Error switching version: ' + error.message, 'error');
+            }
+        };
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load templates if template section exists
+            if (document.getElementById('templateCards')) {
+                loadTemplates();
+            }
+            // Initialize chat widget
+            const chatInput = document.getElementById('chatInput');
+            const chatWidget = document.getElementById('chatWidget');
+            const showBtn = document.getElementById('chatWidgetShowBtn');
+            
+            // Hide show button if chat widget is visible
+            if (chatWidget && showBtn) {
+                if (chatWidget.classList.contains('hidden')) {
+                    showBtn.style.display = 'flex';
+                } else {
+                    showBtn.style.display = 'none';
+                }
+            }
+            
+            if (chatInput && chatWidget && !chatWidget.classList.contains('minimized') && !chatWidget.classList.contains('hidden')) {
+                chatInput.focus();
+            }
+            
+            // Initialize flow canvas event listeners
+            const flowCanvas = document.getElementById('flowCanvas');
+            if (flowCanvas) {
+                // Prevent default drag behavior on canvas
+                flowCanvas.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                });
+                
+                // Handle canvas click to deselect nodes
+                flowCanvas.addEventListener('click', function(e) {
+                    if (e.target === flowCanvas || e.target.id === 'flowConnections') {
+                        if (selectedNode) {
+                            const nodeElement = document.getElementById(selectedNode.id);
+                            if (nodeElement) {
+                                nodeElement.classList.remove('selected');
+                            }
+                            selectedNode = null;
+                        }
+                    }
+                });
+            }
+            
+            // Load existing bot data if editing
+            {% if bot_data %}
+            loadExistingBotData();
+            {% endif %}
+        });
+    </script>
+</body>
+</html>
