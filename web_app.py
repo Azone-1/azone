@@ -92,6 +92,43 @@ db_manager.init_database()
 bot_db_manager.init_bot_database()
 auth_manager.init_auth_database()  # Initialize auth database
 
+# Import and initialize API templates
+try:
+    from api_templates import (
+        init_api_templates,
+        get_leads_template,
+        create_lead_template,
+        update_lead_template,
+        delete_lead_template,
+        get_customers_template,
+        create_customer_template,
+        get_projects_template,
+        create_project_template,
+        update_project_status_template,
+        get_dashboard_stats_template,
+        get_dashboard_chart_data_template
+    )
+    
+    # Initialize API templates with app instance
+    init_api_templates(app)
+    
+    # Register API routes
+    get_leads_template()
+    create_lead_template()
+    update_lead_template()
+    delete_lead_template()
+    get_customers_template()
+    create_customer_template()
+    get_projects_template()
+    create_project_template()
+    update_project_status_template()
+    get_dashboard_stats_template()
+    get_dashboard_chart_data_template()
+    
+    print("API templates initialized and routes registered")
+except Exception as e:
+    print(f"Warning: Could not initialize API templates: {e}")
+
 # Register authentication blueprint
 app.register_blueprint(auth_bp, url_prefix='')
 
@@ -142,23 +179,23 @@ def inject_user():
 
 @app.route('/')
 def index():
-    """Main Dashboard Page - Default to Bot Builder"""
+    """Main Dashboard Page - CRM Dashboard"""
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-    # Redirect to bot-builder as default
-    return redirect(url_for('bot_builder'))
+    # Show CRM Dashboard (index.html)
+    return render_template('index.html')
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    """Dashboard Page - Default to Bot Builder"""
-    # Pass active_menu to template to highlight the correct menu item
-    try:
-        templates = bot_templates.list_templates() or []
-    except Exception as e:
-        print(f"Error loading templates in dashboard: {e}")
-        templates = []
-    return render_template('dashboard.html', templates=templates, active_menu='bot-builder')
+    """CRM Dashboard Page"""
+    return render_template('index.html')
+
+@app.route('/crm')
+@login_required
+def crm_dashboard():
+    """CRM Dashboard Page (alternative route)"""
+    return render_template('index.html')
 
 @app.route('/bot-builder')
 @login_required
@@ -874,7 +911,7 @@ def login():
         if user and check_password_hash(user['password_hash'], password):
             login_user(AppUser(user), remember=remember)
             flash('Login အောင်မြင်ပါသည်။', 'success')
-            next_url = request.args.get('next') or url_for('bot_builder')
+            next_url = request.args.get('next') or url_for('dashboard')
             return redirect(next_url)
         else:
             error = 'Username သို့မဟုတ် Password မမှန်ပါ။'
@@ -1780,22 +1817,41 @@ def facebook_webhook():
     return jsonify({'error': 'Invalid request'}), 400
 
 if __name__ == '__main__':
-    # Get host and port from config
+    # Get host and port from config or environment (Railway sets PORT)
     try:
         import config
-        host = '0.0.0.0'
-        port = config.Config.PORT
+        # Railway provides PORT via environment variable
+        port = int(os.getenv('PORT', config.Config.PORT))
+        host = os.getenv('HOST', config.Config.HOST)
         debug = config.Config.DEBUG
     except:
-        host = '0.0.0.0'
-        port = 8000
-        debug = True
+        # Fallback if config fails
+        port = int(os.getenv('PORT', 5000))
+        host = os.getenv('HOST', '0.0.0.0')
+        debug = False
     
     print(f"\n{'='*50}")
     print(f"🚀 Starting AZone Bot Builder Server")
     print(f"{'='*50}")
     print(f"📍 URL: http://{host}:{port}")
     print(f"🔧 Debug Mode: {debug}")
+    print(f"⏰ 24/7 Mode: Enabled")
     print(f"{'='*50}\n")
     
-    app.run(debug=debug, host=host, port=port)
+    # Configure for 24/7 operation
+    # Disable debug mode for production (prevents auto-reload)
+    if debug:
+        print("⚠ Warning: Debug mode enabled. For 24/7 operation, set DEBUG=False in config")
+    
+    try:
+        # Run server with threaded=True for better handling of concurrent requests
+        app.run(debug=debug, host=host, port=port, threaded=True, use_reloader=False)
+    except KeyboardInterrupt:
+        print("\n\n⚠ Server stopped by user (Ctrl+C)")
+    except Exception as e:
+        logger.error(f"Server error: {e}")
+        import traceback
+        traceback.print_exc()
+        print(f"\n✗ Server crashed: {e}")
+        print("The 24/7 keep-alive script will restart it automatically.")
+        raise  # Re-raise to allow keep-alive script to detect crash

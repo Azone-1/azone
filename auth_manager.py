@@ -19,7 +19,7 @@ AUTH_DB_FILE = 'bots.db'  # Using same database
 # Security constants
 MAX_LOGIN_ATTEMPTS = 5
 LOCKOUT_DURATION = timedelta(minutes=30)
-SESSION_TIMEOUT = timedelta(hours=2)
+SESSION_TIMEOUT = timedelta(hours=24)
 REMEMBER_ME_DURATION = timedelta(days=30)
 PASSWORD_RESET_TOKEN_EXPIRY = timedelta(hours=1)
 CSRF_TOKEN_EXPIRY = timedelta(hours=1)
