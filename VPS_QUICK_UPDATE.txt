@@ -1,0 +1,17 @@
+VPS Quick Update Commands
+==========================
+
+Copy and paste these commands in VPS PowerShell:
+
+cd C:\Azone
+git pull origin main
+python web_app.py
+
+If "main" branch doesn't work, try:
+git pull origin master
+
+If Git is not initialized:
+git init
+git remote add origin https://github.com/Apaing9611-arch/azone.git
+git pull origin main
+
