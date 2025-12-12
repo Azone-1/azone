@@ -14,23 +14,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/chart-styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            background: linear-gradient(180deg, #0e121f 0%, #1a2238 100%);
-            color: #e5e7eb;
-        }
-        .nav-item {
-            color: #cbd5f5;
-        }
-        .nav-item.active {
-            background: rgba(99, 199, 255, 0.15);
-            color: #63c7ff;
-        }
-        .nav-item:hover {
-            background: rgba(99, 199, 255, 0.12);
-            color: #63c7ff;
-        }
-    </style>
 </head>
 <body>
     <div class="dashboard-layout">
@@ -45,17 +28,9 @@
             </div>
             
             <nav class="sidebar-nav">
-                <a href="/bot-builder" class="nav-item active">
-                    <i class="fas fa-robot"></i>
-                    <span>Bot Builder</span>
-                </a>
-                <a href="/dashboard" class="nav-item">
+                <a href="#" class="nav-item active" data-section="dashboard">
                     <i class="fas fa-home"></i>
-                    <span>Admin Panel</span>
-                </a>
-                <a href="/my-bots" class="nav-item">
-                    <i class="fas fa-layer-group"></i>
-                    <span>My Bots</span>
+                    <span>ဒက်ရှ်ဘုတ်</span>
                 </a>
                 <a href="#" class="nav-item" data-section="leads">
                     <i class="fas fa-address-book"></i>
@@ -996,148 +971,6 @@
         // Search and filter handlers
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOM loaded, initializing dashboard...');
-
-            // Mini Bot Builder Wizard -----------------------------
-            const wizardSteps = [
-                {
-                    title: "Enter Your Telegram Bot Token 🎀",
-                    subtitle: "Your bot needs a token to connect. Paste the BotFather token below.",
-                    render: () => `
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Bot Token</label>
-                            <input type="text" class="form-control" id="wizard-token" placeholder="Ex: 123456:ABC-DEF1234ghIkl…">
-                            <div class="form-text">Don’t worry, your token is stored securely 💗</div>
-                        </div>
-                    `
-                },
-                {
-                    title: "Let’s Set Up Your Bot Info 💕",
-                    subtitle: "",
-                    render: () => `
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Bot Name</label>
-                            <input type="text" class="form-control" id="wizard-bot-name" placeholder="Mimi Bot, Cherry Bot…">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Short Description</label>
-                            <input type="text" class="form-control" id="wizard-bot-desc" placeholder="Write a sweet intro for your bot...">
-                        </div>
-                    `
-                },
-                {
-                    title: "Write a Cute Welcome Message 🎀",
-                    subtitle: "This message will be sent to users when they first start your bot.",
-                    render: () => `
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Welcome Message</label>
-                            <textarea class="form-control" id="wizard-welcome" rows="3" placeholder="Hello cutie 💗 Welcome to my bot! How can I help you today?"></textarea>
-                        </div>
-                    `
-                },
-                {
-                    title: "Add Auto Replies 🌸",
-                    subtitle: "Whenever a user asks something, your bot will reply with your preset answers.",
-                    render: () => `
-                        <div id="wizard-qa-list" class="d-flex flex-column gap-3">
-                            ${renderQAItem()}
-                        </div>
-                    `
-                },
-                {
-                    title: "Your Bot Is Ready 🎉💗",
-                    subtitle: "You can now manage broadcasts, users, logs and more from your dashboard.",
-                    render: () => `
-                        <div class="alert alert-success" role="alert">
-                            <strong>All set!</strong> Your bot onboarding is complete.
-                        </div>
-                        <p class="mb-2 text-muted">You can revisit these settings anytime.</p>
-                    `
-                }
-            ];
-
-            let wizardCurrent = 0;
-
-            function renderQAItem(question = "", answer = "") {
-                return `
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body">
-                            <div class="mb-2">
-                                <label class="form-label fw-semibold">Question</label>
-                                <input type="text" class="form-control wizard-qa-question" placeholder="Hi, hello, mingalarpar…" value="${question}">
-                            </div>
-                            <div>
-                                <label class="form-label fw-semibold">Answer</label>
-                                <input type="text" class="form-control wizard-qa-answer" placeholder="Hi 💗 How can I assist you?" value="${answer}">
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            function updateWizard() {
-                const step = wizardSteps[wizardCurrent];
-                const content = document.getElementById('wizard-content');
-                const stepLabel = document.getElementById('wizard-step-label');
-                const stepTitle = document.getElementById('wizard-step-title');
-                const backBtn = document.getElementById('wizard-back');
-                const nextBtn = document.getElementById('wizard-next');
-                const addQaBtn = document.getElementById('wizard-add-qa');
-
-                if (!content || !stepLabel || !stepTitle || !backBtn || !nextBtn || !addQaBtn) return;
-
-                content.innerHTML = `
-                    <div class="mb-2">
-                        <p class="text-muted mb-1">${step.subtitle || ''}</p>
-                    </div>
-                    ${step.render()}
-                `;
-
-                stepLabel.textContent = `Step ${wizardCurrent + 1} of ${wizardSteps.length}`;
-                stepTitle.textContent = step.title;
-
-                backBtn.disabled = wizardCurrent === 0;
-                nextBtn.textContent = wizardCurrent === wizardSteps.length - 1 ? 'Go to Dashboard 🎀' : 'Next ➜';
-
-                // Show Add More button only on Q&A step
-                addQaBtn.style.display = wizardCurrent === 3 ? 'inline-flex' : 'none';
-            }
-
-            function appendQA() {
-                const list = document.getElementById('wizard-qa-list');
-                if (!list) return;
-                list.insertAdjacentHTML('beforeend', renderQAItem());
-            }
-
-            const nextBtn = document.getElementById('wizard-next');
-            const backBtn = document.getElementById('wizard-back');
-            const addQaBtn = document.getElementById('wizard-add-qa');
-
-            if (nextBtn) {
-                nextBtn.addEventListener('click', () => {
-                    if (wizardCurrent < wizardSteps.length - 1) {
-                        wizardCurrent += 1;
-                        updateWizard();
-                    } else {
-                        window.location.href = '/dashboard';
-                    }
-                });
-            }
-
-            if (backBtn) {
-                backBtn.addEventListener('click', () => {
-                    if (wizardCurrent > 0) {
-                        wizardCurrent -= 1;
-                        updateWizard();
-                    }
-                });
-            }
-
-            if (addQaBtn) {
-                addQaBtn.addEventListener('click', appendQA);
-            }
-
-            updateWizard();
-            // ------------------------------------------------------
             // Load dashboard stats immediately
             loadDashboardStats();
             

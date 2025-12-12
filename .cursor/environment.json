@@ -1,0 +1,13 @@
+{
+ {UI rendering
+- state management
+- step transitions
+- validations
+- fetching and saving states
+- backend API integration
+- publish flow
+Ensure it is production-ready and consistent across devices.
+
+  "agentCanUpdateSnapshot": true
+}}
+|

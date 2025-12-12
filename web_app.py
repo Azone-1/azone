@@ -73,12 +73,17 @@ class AppUser(UserMixin):
         return str(self.id)
 
 
+def _normalize_role(role):
+    return role.lower() if isinstance(role, str) else None
+
+
 def is_admin(user=None):
     """Return True when the supplied (or current) user has an admin role."""
     user_obj = user or current_user
+    role = _normalize_role(getattr(user_obj, 'role', None))
     return bool(
         getattr(user_obj, 'is_authenticated', False)
-        and getattr(user_obj, 'role', None) in ADMIN_ROLES
+        and role in ADMIN_ROLES
     )
 
 
@@ -154,7 +159,9 @@ def role_required(*roles):
             if not current_user.is_authenticated:
                 flash('ကျေးဇူးပြု၍ ပထမဦးစွာ login ဝင်ပါ။', 'error')
                 return redirect(url_for('login', next=request.path))
-            if current_user.role not in roles:
+            user_role = _normalize_role(getattr(current_user, 'role', None))
+            allowed = {r if not isinstance(r, str) else r.lower() for r in roles}
+            if user_role not in allowed:
                 abort(403)
             return view_func(*args, **kwargs)
         return wrapper
@@ -190,11 +197,16 @@ def inject_user():
     }
 
 @app.route('/')
-def index():
-    """Main Dashboard Page - CRM Dashboard"""
-    if not current_user.is_authenticated:
+def home():
+    """Default entry: go to Bot Builder (or login if not authenticated)"""
+    print("🐍 Python: Received Home Request (/)")
+    try:
+        if current_user.is_authenticated:
+            return redirect(url_for('bot_builder'))
         return redirect(url_for('login'))
-    return redirect(url_for('bot_builder'))
+    except Exception as error:
+        print(f"❌ Error in home route: {error}")
+        raise
 
 
 @app.route('/admin')
@@ -202,26 +214,42 @@ def index():
 @role_required(*ADMIN_ROLES)
 def admin_home():
     """Admin-only management dashboard."""
-    return render_template('index.html')
+    print("🐍 Python: Received Admin Dashboard Request (/admin)")
+    try:
+        return render_template('index.html')
+    except Exception as error:
+        print(f"❌ Error in admin_home route: {error}")
+        raise
 
 @app.route('/dashboard')
 @login_required
 @role_required(*ADMIN_ROLES)
 def dashboard():
     """Legacy CRM dashboard route (admin-only)."""
-    return admin_home()
+    print("🐍 Python: Received Dashboard Request (/dashboard)")
+    try:
+        return admin_home()
+    except Exception as error:
+        print(f"❌ Error in dashboard route: {error}")
+        raise
 
 @app.route('/crm')
 @login_required
 @role_required(*ADMIN_ROLES)
 def crm_dashboard():
     """CRM Dashboard Page (alternative route)"""
-    return admin_home()
+    print("🐍 Python: Received CRM Dashboard Request (/crm)")
+    try:
+        return admin_home()
+    except Exception as error:
+        print(f"❌ Error in crm_dashboard route: {error}")
+        raise
 
 @app.route('/bot-builder')
 @login_required
 def bot_builder():
     """Bot Builder UI Page"""
+    print("🐍 Python: Received Bot Builder Request (/bot-builder)")
     # Check if bot_name parameter is provided (for editing)
     bot_name = request.args.get('bot_name', '').strip()
     use_draft = request.args.get('draft', 'false').lower() == 'true'
@@ -252,18 +280,23 @@ def bot_builder():
     except Exception as e:
         print(f"Error loading templates in bot_builder: {e}")
         templates = []
-    return render_template('dashboard.html', templates=templates,  
-                         active_menu='bot-builder', 
-                         bot_data=bot_data,
-                         draft_data=draft_data,
-                         live_data=live_data,
-                         versions=versions)
+    try:
+        return render_template('dashboard.html', templates=templates,  
+                             active_menu='bot-builder', 
+                             bot_data=bot_data,
+                             draft_data=draft_data,
+                             live_data=live_data,
+                             versions=versions)
+    except Exception as error:
+        print(f"❌ Error in bot_builder route: {error}")
+        raise
 
 @app.route('/analytics')
 @login_required
 @role_required(*ADMIN_ROLES)
 def analytics():
     """Analytics UI Page"""
+    print("🐍 Python: Received Analytics Request (/analytics)")
     # Get analytics data
     days = int(request.args.get('days', 30))
     bot_id = request.args.get('bot_id', type=int)
@@ -287,61 +320,81 @@ def analytics():
     except Exception as e:
         print(f"Error loading templates in analytics: {e}")
         templates = []
-    return render_template('dashboard.html', templates=templates,  
-                         active_menu='analytics', 
-                         stats=all_stats,
-                         bot_analytics=bot_analytics,
-                         step_analytics=step_analytics,
-                         selected_days=days,
-                         selected_bot_id=bot_id)
+    try:
+        return render_template('dashboard.html', templates=templates,  
+                             active_menu='analytics', 
+                             stats=all_stats,
+                             bot_analytics=bot_analytics,
+                             step_analytics=step_analytics,
+                             selected_days=days,
+                             selected_bot_id=bot_id)
+    except Exception as error:
+        print(f"❌ Error in analytics route: {error}")
+        raise
 
 @app.route('/my-bots')
 @login_required
 @role_required(*ADMIN_ROLES)
 def my_bots():
     """My Bots List Page"""
-    # Fetch all bots from database
-    user_id = current_user.id if current_user.is_authenticated else None
-    role = current_user.role if current_user.is_authenticated else 'viewer'
-    bots = bot_db_manager.get_all_bots(user_id=user_id, role=role)
-    # Pass active_menu and bots list to template
+    print("🐍 Python: Received My Bots Request (/my-bots)")
     try:
-        templates = bot_templates.list_templates() or []
-    except Exception as e:
-        print(f"Error loading templates in my_bots: {e}")
-        templates = []
-    return render_template('dashboard.html', templates=templates, active_menu='my-bots', bots=bots)
+        # Fetch all bots from database
+        user_id = current_user.id if current_user.is_authenticated else None
+        role = current_user.role if current_user.is_authenticated else 'viewer'
+        bots = bot_db_manager.get_all_bots(user_id=user_id, role=role)
+        # Pass active_menu and bots list to template
+        try:
+            templates = bot_templates.list_templates() or []
+        except Exception as e:
+            print(f"Error loading templates in my_bots: {e}")
+            templates = []
+        return render_template('dashboard.html', templates=templates, active_menu='my-bots', bots=bots)
+    except Exception as error:
+        print(f"❌ Error in my_bots route: {error}")
+        raise
 
 @app.route('/templates')
 @login_required
 @role_required(*ADMIN_ROLES)
 def templates_page():
     """Templates Library Page"""
+    print("🐍 Python: Received Templates Page Request (/templates)")
     try:
-        templates = bot_templates.list_templates() or []
-    except Exception as e:
-        print(f"Error loading templates in templates_page: {e}")
-        templates = []
-    return render_template('dashboard.html', templates=templates, active_menu='templates')
+        try:
+            templates = bot_templates.list_templates() or []
+        except Exception as e:
+            print(f"Error loading templates in templates_page: {e}")
+            templates = []
+        return render_template('dashboard.html', templates=templates, active_menu='templates')
+    except Exception as error:
+        print(f"❌ Error in templates_page route: {error}")
+        raise
 
 @app.route('/gemini-chat')
 @login_required
 def gemini_chat_page():
     """Gemini AI Chat Page"""
-    # Check if Gemini is available
-    gemini_available = gemini_service.GeminiService.is_available()
+    print("🐍 Python: Received Gemini Chat Request (/gemini-chat)")
     try:
-        templates = bot_templates.list_templates() or []
-    except Exception as e:
-        print(f"Error loading templates in gemini_chat_page: {e}")
-        templates = []
-    return render_template('dashboard.html', templates=templates, active_menu='gemini-chat', gemini_available=gemini_available)
+        # Check if Gemini is available
+        gemini_available = gemini_service.GeminiService.is_available()
+        try:
+            templates = bot_templates.list_templates() or []
+        except Exception as e:
+            print(f"Error loading templates in gemini_chat_page: {e}")
+            templates = []
+        return render_template('dashboard.html', templates=templates, active_menu='gemini-chat', gemini_available=gemini_available)
+    except Exception as error:
+        print(f"❌ Error in gemini_chat_page route: {error}")
+        raise
 
 @app.route('/api/bot/delete/<bot_name>', methods=['DELETE', 'POST'])
 @login_required
 @role_required('owner', 'editor')
 def delete_bot(bot_name):
     """Delete a bot from the database and disconnect Telegram if connected"""
+    print(f"🐍 Python: Received Delete Bot Request for '{bot_name}'")
     try:
         # Decode URL-encoded bot name
         bot_name = unquote_plus(bot_name)
@@ -395,6 +448,7 @@ def save_bot():
     Handle bot configuration form submission
     Saves or updates bot data in the database
     """
+    print("🐍 Python: Received Save Bot Request (/save-bot)")
     try:
         # Get form data - handle both JSON and form data
         print(f"Request method: {request.method}")
@@ -546,6 +600,7 @@ def publish_bot():
     """
     Publish a draft bot (promote draft to published)
     """
+    print("🐍 Python: Received Publish Bot Request (/publish-bot)")
     try:
         # Get bot name from request
         if request.is_json or (request.content_type and 'application/json' in request.content_type):
@@ -604,6 +659,7 @@ def chat():
     Advanced Chatbot API Endpoint
     Uses BotLogicEngine for intelligent conversation handling
     """
+    print("🐍 Python: Received Chat Request (/chat)")
     try:
         # Get JSON data from request
         if not request.is_json:
@@ -697,6 +753,7 @@ def schedule():
     Handle form submission for scheduling a new post
     Inserts the post into the database
     """
+    print("🐍 Python: Received Schedule Request (/schedule)")
     try:
         # Get form data
         data = request.get_json() if request.is_json else request.form
@@ -737,6 +794,7 @@ def schedule():
 @app.route('/api/analytics/stats', methods=['GET'])
 def api_analytics_stats():
     """API endpoint for analytics statistics"""
+    print("🐍 Python: Received Analytics Stats API Request (/api/analytics/stats)")
     try:
         days = int(request.args.get('days', 30))
         bot_id = request.args.get('bot_id', type=int)
@@ -766,6 +824,7 @@ def api_analytics_stats():
 @login_required
 def export_analytics():
     """Export analytics data as CSV"""
+    print("🐍 Python: Received Analytics Export Request (/api/analytics/export)")
     try:
         bot_id = request.args.get('bot_id', type=int)
         days = int(request.args.get('days', 30))
@@ -824,6 +883,7 @@ def export_analytics():
 @app.route('/api/bot/export/<bot_name>', methods=['GET'])
 @login_required
 def export_bot(bot_name):
+    print(f"🐍 Python: Received Export Bot Request for '{bot_name}' (/api/bot/export)")
     bot_name = unquote_plus(bot_name)
     """Export bot configuration as JSON"""
     try:
@@ -855,6 +915,7 @@ def export_bot(bot_name):
 @login_required
 def import_bot():
     """Import bot configuration from JSON"""
+    print("🐍 Python: Received Import Bot Request (/api/bot/import)")
     try:
         if not request.is_json:
             return jsonify({
@@ -911,118 +972,159 @@ def import_bot():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """User login view."""
-    if current_user.is_authenticated:
-        return redirect(url_for('bot_builder'))
-    
-    error = None
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
-        remember = request.form.get('remember') == 'on'
+    print("🐍 Python: Received Login Request (/login)")
+    try:
+        if current_user.is_authenticated:
+            return redirect(url_for('bot_builder'))
         
-        user = bot_db_manager.get_user_by_username(username)
+        error = None
+        if request.method == 'POST':
+            username = request.form.get('username', '').strip()
+            password = request.form.get('password', '').strip()
+            remember = request.form.get('remember') == 'on'
+            
+            user = bot_db_manager.get_user_by_username(username)
 
-        # DEBUG: log login attempt
-        print(f'[LOGIN DEBUG] submitted username/email: {username!r}')
-        attempted_email_fallback = False
-        if not user and '@' in username:
-            attempted_email_fallback = True
-            print('[LOGIN DEBUG] attempting lookup by email')
-            user = bot_db_manager.get_user_by_email(username)
+            # DEBUG: log login attempt
+            print(f'[LOGIN DEBUG] submitted username/email: {username!r}')
+            attempted_email_fallback = False
+            if not user and '@' in username:
+                attempted_email_fallback = True
+                print('[LOGIN DEBUG] attempting lookup by email')
+                user = bot_db_manager.get_user_by_email(username)
 
-        if not user and "@" in username:
-            user = bot_db_manager.get_user_by_email(username)
-        if user and check_password_hash(user['password_hash'], password):
-            login_user(AppUser(user), remember=remember)
-            flash('Login အောင်မြင်ပါသည်။', 'success')
-            next_url = request.args.get('next')
-            if not next_url:
-                next_url = url_for('bot_builder')
-            return redirect(next_url)
-        else:
-            error = 'Username သို့မဟုတ် Password မမှန်ပါ။'
-    
-    return render_template('login.html', mode='login', error=error)
+            if not user and "@" in username:
+                user = bot_db_manager.get_user_by_email(username)
+            if user and check_password_hash(user['password_hash'], password):
+                login_user(AppUser(user), remember=remember)
+                flash('Login အောင်မြင်ပါသည်။', 'success')
+                next_url = request.args.get('next')
+                if not next_url:
+                    next_url = url_for('bot_builder')
+                return redirect(next_url)
+            else:
+                error = 'Username သို့မဟုတ် Password မမှန်ပါ။'
+        
+        return render_template('login.html', mode='login', error=error)
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in login route: {error}")
+        flash('အပြန်ရပ် Internal Error – please retry.', 'error')
+        return render_template('login.html', mode='login', error='Internal server error')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     """User registration view."""
-    if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '').strip()
-        role = request.form.get('role', 'viewer')
+    print("🐍 Python: Received Register Request (/register)")
+    try:
+        if request.method == 'POST':
+            username = request.form.get('username', '').strip()
+            email = request.form.get('email', '').strip()
+            password = request.form.get('password', '').strip()
+            role = request.form.get('role', 'viewer')
+            
+            if not username or not email or not password:
+                flash('အချက်အလက်များကို ပြည့်စုံရေးပါ။', 'error')
+                return render_template('login.html', mode='register')
+            
+            # Restrict elevated role creation to owners
+            if role in ['owner', 'editor']:
+                if not current_user.is_authenticated or current_user.role != 'owner':
+                    role = 'viewer'
+            
+            password_hash = generate_password_hash(password)
+            success, user_id, error_message = bot_db_manager.create_user(
+                username=username,
+                email=email,
+                password_hash=password_hash,
+                role=role
+            )
+            
+            if success:
+                flash('အကောင့်အသစ် ဖန်တီးပြီးပါပြီ။ Login ဝင်ပါ။', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash(error_message or 'အကောင့် ဖန်တီးရာတွင် ပြဿနာရှိသည်။', 'error')
         
-        if not username or not email or not password:
-            flash('အချက်အလက်များကို ပြည့်စုံရေးပါ။', 'error')
-            return render_template('login.html', mode='register')
-        
-        # Restrict elevated role creation to owners
-        if role in ['owner', 'editor']:
-            if not current_user.is_authenticated or current_user.role != 'owner':
-                role = 'viewer'
-        
-        password_hash = generate_password_hash(password)
-        success, user_id, error_message = bot_db_manager.create_user(
-            username=username,
-            email=email,
-            password_hash=password_hash,
-            role=role
-        )
-        
-        if success:
-            flash('အကောင့်အသစ် ဖန်တီးပြီးပါပြီ။ Login ဝင်ပါ။', 'success')
-            return redirect(url_for('login'))
-        else:
-            flash(error_message or 'အကောင့် ဖန်တီးရာတွင် ပြဿနာရှိသည်။', 'error')
-    
-    return render_template('login.html', mode='register')
+        return render_template('login.html', mode='register')
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in register route: {error}")
+        flash('အကောင့်ဖန်တီးရာတွင် Internal Error ဖြစ်သည်။', 'error')
+        return render_template('login.html', mode='register')
 
 @app.route('/logout')
 @login_required
 def logout():
     """Logout current user."""
-    logout_user()
-    session.clear()
-    flash('ထွက်ခွါပြီးပါပြီ။', 'success')
-    return redirect(url_for('login'))
+    print("🐍 Python: Received Logout Request (/logout)")
+    try:
+        logout_user()
+        session.clear()
+        flash('ထွက်ခွါပြီးပါပြီ။', 'success')
+        return redirect(url_for('login'))
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in logout route: {error}")
+        flash('Logout ပြုလုပ်ရာတွင် ပြဿနာရှိပါသည်။', 'error')
+        return redirect(url_for('login'))
 
 @app.route('/users')
 @login_required
 @role_required('owner')
 def user_management():
     """User management view for owners."""
-    users = bot_db_manager.list_users()
+    print("🐍 Python: Received User Management Request (/users)")
     try:
-        templates = bot_templates.list_templates() or []
-    except Exception as e:
-        print(f"Error loading templates in user_management: {e}")
-        templates = []
-    return render_template('dashboard.html', templates=templates, active_menu='users', users=users)
+        users = bot_db_manager.list_users()
+        try:
+            templates = bot_templates.list_templates() or []
+        except Exception as e:
+            print(f"Error loading templates in user_management: {e}")
+            templates = []
+        return render_template('dashboard.html', templates=templates, active_menu='users', users=users)
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in user_management route: {error}")
+        flash('User management data load failed.', 'error')
+        return render_template('dashboard.html', templates=[], active_menu='users', users=[])
 
 @app.route('/users/update-role', methods=['POST'])
 @login_required
 @role_required('owner')
 def update_user_role():
     """Update a user's role."""
-    user_id = request.form.get('user_id', type=int)
-    role = request.form.get('role', 'viewer')
-    
-    if not user_id:
-        flash('User ID မရှိပါ။', 'error')
+    print("🐍 Python: Received Update User Role Request (/users/update-role)")
+    try:
+        user_id = request.form.get('user_id', type=int)
+        role = request.form.get('role', 'viewer')
+        
+        if not user_id:
+            flash('User ID မရှိပါ။', 'error')
+            return redirect(url_for('user_management'))
+        
+        if bot_db_manager.update_user_role(user_id, role):
+            flash('Role ကို အောင်မြင်စွာ ပြင်ဆင်လိုက်ပါပြီ။', 'success')
+        else:
+            flash('Role ပြင်ရန် မအောင်မြင်ပါ။', 'error')
         return redirect(url_for('user_management'))
-    
-    if bot_db_manager.update_user_role(user_id, role):
-        flash('Role ကို အောင်မြင်စွာ ပြင်ဆင်လိုက်ပါပြီ။', 'success')
-    else:
-        flash('Role ပြင်ရန် မအောင်မြင်ပါ။', 'error')
-    return redirect(url_for('user_management'))
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in update_user_role route: {error}")
+        flash('Role အသွင်ပြင်ရာတွင် ပြဿနာရှိပါသည်။', 'error')
+        return redirect(url_for('user_management'))
 
 @app.route('/users/delete/<int:user_id>', methods=['POST', 'DELETE'])
 @login_required
 @role_required('owner')
 def delete_user(user_id):
     """Delete a user from the database."""
+    print(f"🐍 Python: Received Delete User Request for ID {user_id} (/users/delete)")
     try:
         # Prevent deleting yourself
         if user_id == current_user.id:
@@ -1056,6 +1158,7 @@ def delete_user(user_id):
 def get_bot_versions_api(bot_name):
     bot_name = unquote_plus(bot_name)
     """Get all versions of a bot"""
+    print(f"🐍 Python: Received Bot Versions Request for '{bot_name}' (/api/bot/<name>/versions)")
     try:
         versions = bot_db_manager.get_bot_versions(bot_name)
         
@@ -1080,6 +1183,7 @@ def get_bot_versions_api(bot_name):
 def publish_bot_draft(bot_name):
     bot_name = unquote_plus(bot_name)
     """Publish a draft version of a bot"""
+    print(f"🐍 Python: Received Publish Draft Request for '{bot_name}' (/api/bot/<name>/publish)")
     try:
         # Decode URL-encoded bot name
         bot_name = bot_name.replace('%20', ' ')
@@ -1110,6 +1214,7 @@ def publish_bot_draft(bot_name):
 def get_bot_draft(bot_name):
     bot_name = unquote_plus(bot_name)
     """Get the draft version of a bot"""
+    print(f"🐍 Python: Received Bot Draft Request for '{bot_name}' (/api/bot/<name>/draft)")
     try:
         # Decode URL-encoded bot name
         bot_name = bot_name.replace('%20', ' ')
@@ -1137,6 +1242,7 @@ def get_bot_draft(bot_name):
 def get_bot_live(bot_name):
     bot_name = unquote_plus(bot_name)
     """Get the live version of a bot"""
+    print(f"🐍 Python: Received Bot Live Request for '{bot_name}' (/api/bot/<name>/live)")
     try:
         # Decode URL-encoded bot name
         bot_name = bot_name.replace('%20', ' ')
@@ -1164,6 +1270,7 @@ def get_bot_live(bot_name):
 def test_bot_draft(bot_name):
     bot_name = unquote_plus(bot_name)
     """Test a draft version (chat with draft without publishing)"""
+    print(f"🐍 Python: Received Test Draft Request for '{bot_name}' (/api/bot/<name>/test-draft)")
     try:
         # Decode URL-encoded bot name
         bot_name = bot_name.replace('%20', ' ')
@@ -1229,6 +1336,7 @@ def test_bot_draft(bot_name):
 @role_required('owner', 'editor')
 def switch_bot_version(bot_name, version_number):
     """Switch to a specific version (make it live)"""
+    print(f"🐍 Python: Received Switch Bot Version Request for '{bot_name}' to version {version_number} (/api/bot/<name>/switch-version)")
     try:
         # Decode URL-encoded bot name
         bot_name = bot_name.replace('%20', ' ')
@@ -1298,6 +1406,7 @@ def switch_bot_version(bot_name, version_number):
 @login_required
 def list_templates():
     """List all available bot templates, optionally filtered by platform"""
+    print("🐍 Python: Received Templates List API Request (/api/templates)")
     try:
         platform = request.args.get('platform', None)
         templates = bot_templates.list_templates(platform=platform)
@@ -1324,22 +1433,33 @@ def list_templates():
 @login_required
 def get_template(template_id):
     """Get a specific bot template"""
-    template = bot_templates.get_template(template_id)
-    if not template:
+    print(f"🐍 Python: Received Template Detail Request for '{template_id}' (/api/templates/<id>)")
+    try:
+        template = bot_templates.get_template(template_id)
+        if not template:
+            return jsonify({
+                'success': False,
+                'error': 'Template not found'
+            }), 404
+        
+        return jsonify({
+            'success': True,
+            'template': template
+        }), 200
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in get_template route: {error}")
         return jsonify({
             'success': False,
-            'error': 'Template not found'
-        }), 404
-    
-    return jsonify({
-        'success': True,
-        'template': template
-    }), 200
+            'error': f'Error retrieving template: {str(error)}'
+        }), 500
 
 @app.route('/api/templates/<template_id>/load', methods=['GET'])
 @login_required
 def load_template(template_id):
     """Load template data for preview/editing (doesn't create bot)"""
+    print(f"🐍 Python: Received Load Template Request for '{template_id}' (/api/templates/<id>/load)")
     try:
         template = bot_templates.get_template(template_id)
         if not template:
@@ -1371,49 +1491,59 @@ def load_template(template_id):
 @login_required
 def create_from_template(template_id):
     """Create a bot from a template"""
-    if not request.is_json:
+    print(f"🐍 Python: Received Create From Template Request for '{template_id}' (/api/templates/<id>/create)")
+    try:
+        if not request.is_json:
+            return jsonify({
+                'success': False,
+                'error': 'Content-Type must be application/json'
+            }), 400
+        
+        data = request.get_json()
+        bot_name = data.get('bot_name', '').strip()
+        
+        if not bot_name:
+            return jsonify({
+                'success': False,
+                'error': 'Bot name is required'
+            }), 400
+        
+        bot_config = bot_templates.create_bot_from_template(template_id, bot_name)
+        if not bot_config:
+            return jsonify({
+                'success': False,
+                'error': 'Template not found'
+            }), 404
+        
+        # Save the bot to database (publish immediately so it shows up in lists)
+        success, message, bot_id = bot_db_manager.save_bot(
+            bot_name=bot_config['bot_name'],
+            initial_greeting=bot_config['initial_greeting'],
+            steps_data=bot_config['steps'],
+            owner_id=current_user.id,
+            publish=True  # Publish immediately so bot is visible
+        )
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': f'Bot "{bot_config["bot_name"]}" created from template successfully',
+                'bot_id': bot_id,
+                'bot_name': bot_config['bot_name']
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'error': message
+            }), 400
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in create_from_template route: {error}")
         return jsonify({
             'success': False,
-            'error': 'Content-Type must be application/json'
-        }), 400
-    
-    data = request.get_json()
-    bot_name = data.get('bot_name', '').strip()
-    
-    if not bot_name:
-        return jsonify({
-            'success': False,
-            'error': 'Bot name is required'
-        }), 400
-    
-    bot_config = bot_templates.create_bot_from_template(template_id, bot_name)
-    if not bot_config:
-        return jsonify({
-            'success': False,
-            'error': 'Template not found'
-        }), 404
-    
-    # Save the bot to database (publish immediately so it shows up in lists)
-    success, message, bot_id = bot_db_manager.save_bot(
-        bot_name=bot_config['bot_name'],
-        initial_greeting=bot_config['initial_greeting'],
-        steps_data=bot_config['steps'],
-        owner_id=current_user.id,
-        publish=True  # Publish immediately so bot is visible
-    )
-    
-    if success:
-        return jsonify({
-            'success': True,
-            'message': f'Bot "{bot_config["bot_name"]}" created from template successfully',
-            'bot_id': bot_id,
-            'bot_name': bot_config['bot_name']
-        }), 200
-    else:
-        return jsonify({
-            'success': False,
-            'error': message
-        }), 400
+            'error': f'Error creating bot from template: {str(error)}'
+        }), 500
 
 # ==================== GEMINI AI API ENDPOINTS ====================
 
@@ -1424,6 +1554,7 @@ def gemini_chat():
     Chat with Gemini AI
     Used for conversational advice and discussions
     """
+    print("🐍 Python: Received Gemini Chat API Request (/api/gemini/chat)")
     try:
         if not request.is_json:
             return jsonify({
@@ -1495,6 +1626,7 @@ def gemini_chat():
 @login_required
 def gemini_status():
     """Check if Gemini service is available"""
+    print("🐍 Python: Received Gemini Status Request (/api/gemini/status)")
     try:
         is_available = gemini_service.GeminiService.is_available()
         return jsonify({
@@ -1516,6 +1648,7 @@ def gemini_status():
 @role_required('owner', 'editor')
 def connect_telegram(bot_name):
     """Connect a bot to Telegram"""
+    print(f"🐍 Python: Received Telegram Connect Request for '{bot_name}' (/api/telegram/connect)")
     if not TELEGRAM_AVAILABLE:
         return jsonify({
             'success': False,
@@ -1578,6 +1711,7 @@ def connect_telegram(bot_name):
 @role_required('owner', 'editor')
 def disconnect_telegram(bot_name):
     """Disconnect a bot from Telegram"""
+    print(f"🐍 Python: Received Telegram Disconnect Request for '{bot_name}' (/api/telegram/disconnect)")
     if not TELEGRAM_AVAILABLE:
         return jsonify({
             'success': False,
@@ -1609,6 +1743,7 @@ def disconnect_telegram(bot_name):
 @login_required
 def telegram_status(bot_name):
     """Check Telegram bot status"""
+    print(f"🐍 Python: Received Telegram Status Request for '{bot_name}' (/api/telegram/status)")
     if not TELEGRAM_AVAILABLE:
         return jsonify({
             'success': True,
@@ -1642,6 +1777,7 @@ def telegram_status(bot_name):
 @role_required('owner', 'editor')
 def connect_facebook(bot_name):
     """Connect a bot to Facebook Messenger"""
+    print(f"🐍 Python: Received Facebook Connect Request for '{bot_name}' (/api/facebook/connect)")
     if not FACEBOOK_AVAILABLE:
         return jsonify({
             'success': False,
@@ -1704,6 +1840,7 @@ def connect_facebook(bot_name):
 @role_required('owner', 'editor')
 def disconnect_facebook(bot_name):
     """Disconnect a bot from Facebook Messenger"""
+    print(f"🐍 Python: Received Facebook Disconnect Request for '{bot_name}' (/api/facebook/disconnect)")
     if not FACEBOOK_AVAILABLE:
         return jsonify({
             'success': False,
@@ -1735,6 +1872,7 @@ def disconnect_facebook(bot_name):
 @login_required
 def facebook_status(bot_name):
     """Check Facebook Messenger bot status"""
+    print(f"🐍 Python: Received Facebook Status Request for '{bot_name}' (/api/facebook/status)")
     if not FACEBOOK_AVAILABLE:
         return jsonify({
             'success': True,
@@ -1767,6 +1905,7 @@ def facebook_status(bot_name):
 @login_required
 def get_facebook_webhook_url():
     """Get Facebook webhook URL for configuration"""
+    print("🐍 Python: Received Facebook Webhook URL Request (/api/facebook/webhook-url)")
     try:
         webhook_url = get_webhook_url()
         verify_token = os.getenv('FACEBOOK_VERIFY_TOKEN', 'azone_bot_verify_token')
@@ -1788,59 +1927,66 @@ def facebook_webhook():
     GET: Webhook verification
     POST: Receive messages
     """
+    print("🐍 Python: Received Facebook Webhook Event (/webhook/facebook)")
     if not FACEBOOK_AVAILABLE:
         return jsonify({'error': 'Facebook integration not available'}), 400
     
-    if request.method == 'GET':
-        # Webhook verification
-        mode = request.args.get('hub.mode')
-        token = request.args.get('hub.verify_token')
-        challenge = request.args.get('hub.challenge')
+    try:
+        if request.method == 'GET':
+            # Webhook verification
+            mode = request.args.get('hub.mode')
+            token = request.args.get('hub.verify_token')
+            challenge = request.args.get('hub.challenge')
+            
+            verify_token = os.getenv('FACEBOOK_VERIFY_TOKEN', 'azone_bot_verify_token')
+            
+            if mode == 'subscribe' and token == verify_token:
+                logger.info("Facebook webhook verified")
+                return challenge, 200
+            else:
+                logger.warning("Facebook webhook verification failed")
+                return jsonify({'error': 'Verification failed'}), 403
         
-        verify_token = os.getenv('FACEBOOK_VERIFY_TOKEN', 'azone_bot_verify_token')
+        elif request.method == 'POST':
+            # Handle incoming messages
+            try:
+                data = request.get_json()
+                
+                if data.get('object') == 'page':
+                    entries = data.get('entry', [])
+                    for entry in entries:
+                        messaging = entry.get('messaging', [])
+                        for event in messaging:
+                            if event.get('message') and event.get('message').get('text'):
+                                # Get sender ID
+                                sender_id = event['sender']['id']
+                                message_text = event['message']['text']
+                                
+                                # Find which bot should handle this (for now, use first running bot)
+                                # In production, you'd map sender_id to bot_name
+                                # For simplicity, we'll use the first running bot
+                                if facebook_bots:
+                                    # Get first running bot (you can improve this logic)
+                                    bot_name = list(facebook_bots.keys())[0]
+                                    service = facebook_bots[bot_name]
+                                    service.process_webhook_event(event)
+                                else:
+                                    logger.warning("No Facebook bots running to handle message")
+                
+                return jsonify({'status': 'ok'}), 200
+                
+            except Exception as e:
+                logger.error(f"Error processing Facebook webhook: {e}")
+                import traceback
+                traceback.print_exc()
+                return jsonify({'error': str(e)}), 500
         
-        if mode == 'subscribe' and token == verify_token:
-            logger.info("Facebook webhook verified")
-            return challenge, 200
-        else:
-            logger.warning("Facebook webhook verification failed")
-            return jsonify({'error': 'Verification failed'}), 403
-    
-    elif request.method == 'POST':
-        # Handle incoming messages
-        try:
-            data = request.get_json()
-            
-            if data.get('object') == 'page':
-                entries = data.get('entry', [])
-                for entry in entries:
-                    messaging = entry.get('messaging', [])
-                    for event in messaging:
-                        if event.get('message') and event.get('message').get('text'):
-                            # Get sender ID
-                            sender_id = event['sender']['id']
-                            message_text = event['message']['text']
-                            
-                            # Find which bot should handle this (for now, use first running bot)
-                            # In production, you'd map sender_id to bot_name
-                            # For simplicity, we'll use the first running bot
-                            if facebook_bots:
-                                # Get first running bot (you can improve this logic)
-                                bot_name = list(facebook_bots.keys())[0]
-                                service = facebook_bots[bot_name]
-                                service.process_webhook_event(event)
-                            else:
-                                logger.warning("No Facebook bots running to handle message")
-            
-            return jsonify({'status': 'ok'}), 200
-            
-        except Exception as e:
-            logger.error(f"Error processing Facebook webhook: {e}")
-            import traceback
-            traceback.print_exc()
-            return jsonify({'error': str(e)}), 500
-    
-    return jsonify({'error': 'Invalid request'}), 400
+        return jsonify({'error': 'Invalid request'}), 400
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        print(f"❌ Error in facebook_webhook route: {error}")
+        return jsonify({'error': f'Webhook failure: {str(error)}'}), 500
 
 if __name__ == '__main__':
     # Get host and port from config or environment (Railway sets PORT)
