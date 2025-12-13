@@ -19,7 +19,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here-change-in-production')
     
     # Gemini API Configuration
-    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'AIzaSyD8Zki9uebkYj_WgvsXjwmMnx_P3VvySB0')
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY',)
     
     # Database paths
     BOT_DB_PATH = os.getenv('BOT_DB_PATH', 'bots.db')
